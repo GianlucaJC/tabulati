@@ -8,7 +8,7 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## Tabulati JCsnc 1.1
+## Tabulati JCsnc 1.2 - (versione di prova)
 
 ## About Laravel
 
