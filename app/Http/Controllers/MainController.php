@@ -519,7 +519,6 @@ class mainController extends Controller
 
 			if ($direct_pub==null && $test==false) {
 				
-
 			/*
 				N.B.
 				
