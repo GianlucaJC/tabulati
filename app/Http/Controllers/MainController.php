@@ -321,10 +321,16 @@ class mainController extends Controller
 			
 			$rowData=[];
 
-			//la function tracciato fa una mappatura tra l'array grezzo e 
-			//l'array definito per la struttura di riferimento
-			$infocampi=$this->tracciato($file_json);
+			/*
+				la function tracciato fa una mappatura tra l'array grezzo e 
+				l'array definito per la struttura di riferimento
+				
+				29.08.2022-->la mappatura con il file json avviene solo per CSV con pubblicazione diretta
+				quindi $file_json contiene sempre standard.json (in public/tracciati)
+				
+			*/
 			
+			$infocampi=$this->tracciato($file_json);
 			foreach ($importData_arr as $importData) {
 				
 				

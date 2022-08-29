@@ -81,7 +81,7 @@
 			
 	</div>
 	
-	<div id='div_table_schema' class='mt-2'>
+	<div id='div_table_schema' class='mt-2' style='display:none'>
 			<table id="tb_schema">
 				<thead>
 					<tr>
