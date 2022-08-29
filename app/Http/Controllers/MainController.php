@@ -206,9 +206,13 @@ class mainController extends Controller
 			if ($i == 0) {
 				$i++;
 				/*
-					Il primo record di instestazione DEVE contenere i campi 
-					da importare, non è importante la sequenza perchè poi mapperò
-					il tutto tramite associazione campi con l'array da riversare nel DB
+					- Per i CSV NON diretti:
+						Il primo record di instestazione DEVE contenere i campi 
+						da importare, non è importante la sequenza perchè poi mapperò
+						il tutto tramite associazione campi con l'array da riversare nel DB
+					
+					- Per i CSV direct_pub:
+						lo schema di riferimento è standard.json 
 				*/
 				for ($c = 0; $c < $num; $c++) {
 					$map_campi[$filedata[$c]]=$c;
@@ -307,6 +311,8 @@ class mainController extends Controller
 		
 		$ent=0;
 		$code="";
+		$tot_new=-1;
+		$tot_up=-1;		
 		try {
 			$j=0;$message="";
 			
@@ -502,8 +508,9 @@ class mainController extends Controller
 					DB::table("fo_admin.test_import")->insert($rowData);
 				unset($rowData);
 			}
-			$tot_new=-1;
-			$tot_up=-1;
+			
+
+
 			if ($direct_pub==null && $test==false) {
 				
 
