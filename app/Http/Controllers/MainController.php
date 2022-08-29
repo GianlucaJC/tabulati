@@ -326,46 +326,47 @@ class mainController extends Controller
 				if (count($importData)<20) continue;
 				$j++;
 				$dati=array();	
-				//da implementare al posto della foreach attuale
-				foreach ($map_campi as $campo=>$pos_campo) {
-					$pos_campo=$map_campi[$campo];
-					if (isset($importData[$pos_campo])) {
-						if ($campo=="datanasc" || $campo=="dataassu"  || $campo=="datalice" || $campo=="datasind" || $campo=="datape" || $campo=="data")
-							$dati[$campo]=$this->data_en($importData[$pos_campo]);
-						else {	
-							$dati[$campo]=$importData[$pos_campo];
+				if ($direct_pub==null) {
+					foreach ($map_campi as $campo=>$pos_campo) {
+						$pos_campo=$map_campi[$campo];
+						if (isset($importData[$pos_campo])) {
+							if ($campo=="datanasc" || $campo=="dataassu"  || $campo=="datalice" || $campo=="datasind" || $campo=="datape" || $campo=="data")
+								$dati[$campo]=$this->data_en($importData[$pos_campo]);
+							else {	
+								$dati[$campo]=$importData[$pos_campo];
+							}
 						}
 					}
 				}
-				/*
-				foreach($infocampi['struttura'] as $campo=>$value) {
-					$pos=$infocampi['struttura'][$campo]['pos'];
-					if (isset($infocampi['struttura'][$campo]['tipo'])) {
-						//importazione da formattare per altri tipi
-						if ($infocampi['struttura'][$campo]['tipo']==1) {				
-							//check tipo data!
+				else {
+					foreach($infocampi['struttura'] as $campo=>$value) {
+						$pos=$infocampi['struttura'][$campo]['pos'];
+						if (isset($infocampi['struttura'][$campo]['tipo'])) {
+							//importazione da formattare per altri tipi
+							if ($infocampi['struttura'][$campo]['tipo']==1) {				
+								//check tipo data!
+								if (!isset($importData[$pos]) || $pos=="N")
+									 $no_campo=1; //non importo il campo
+								else
+									$dati[$campo]=$this->data_en($importData[$pos]); //da sistemare!
+							}
+						} else {
+							//importazione diretta per tipi char, int, etc.
+							//se la posizione non esiste invalido il record da importare
 							if (!isset($importData[$pos]) || $pos=="N")
-								 $no_campo=1; //non importo il campo
-							else
-								$dati[$campo]=$this->data_en($importData[$pos]); //da sistemare!
-						}
-					} else {
-						//importazione diretta per tipi char, int, etc.
-						//se la posizione non esiste invalido il record da importare
-						if (!isset($importData[$pos]) || $pos=="N")
-							$no_campo=1; //non importo il campo						
-						else {
-							//per i campi data non ho fatto affidamento alla proprietà tipo perchè non l'ho gestito nei json...quindi faccio riferimento in modo statico alle colonne conosciute
-							if ($campo=="datanasc" || $campo=="dataassu"  || $campo=="datalice" || $campo=="datasind" || $campo=="datape" || $campo=="data")
-								$dati[$campo]=$this->data_en($importData[$pos]);
-							else {	
-								$dati[$campo]=$importData[$pos];
+								$no_campo=1; //non importo il campo						
+							else {
+								//per i campi data non ho fatto affidamento alla proprietà tipo perchè non l'ho gestito nei json...quindi faccio riferimento in modo statico alle colonne conosciute
+								if ($campo=="datanasc" || $campo=="dataassu"  || $campo=="datalice" || $campo=="datasind" || $campo=="datape" || $campo=="data")
+									$dati[$campo]=$this->data_en($importData[$pos]);
+								else {	
+									$dati[$campo]=$importData[$pos];
 
+								}	
 							}	
-						}	
-					}				
+						}				
+					}
 				}
-				*/
 
 				
 				//passaggio da array $dati ad $arr per mappatura ORM utile per l'inserimento nel DB
