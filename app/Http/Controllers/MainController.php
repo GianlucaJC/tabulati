@@ -190,7 +190,7 @@ class mainController extends Controller
 		$file = fopen($filepath, "r");
 		$importData_arr = array();
 		$i = 0;
-
+		$map_campi=array();
 		//Importazione grezza di tutti i campi del csv in un array di comodo
 		while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
 			$num = count($filedata);
@@ -202,6 +202,21 @@ class mainController extends Controller
 				}
 			}
 			*/
+			
+			if ($i == 0) {
+				$i++;
+				/*
+					Il primo record di instestazione DEVE contenere i campi 
+					da importare, non è importante la sequenza perchè poi mapperò
+					il tutto tramite associazione campi con l'array da riversare nel DB
+				*/
+				for ($c = 0; $c < $num; $c++) {
+					$map_campi[$filedata[$c]]=$c;
+				}
+
+				continue;
+			} 
+
 			for ($c = 0; $c < $num; $c++) {
 				$importData_arr[$i][] = $filedata[$c];
 			}
@@ -311,7 +326,18 @@ class mainController extends Controller
 				if (count($importData)<20) continue;
 				$j++;
 				$dati=array();	
-
+				//da implementare al posto della foreach attuale
+				foreach ($map_campi as $campo=>$pos_campo) {
+					$pos_campo=$map_campi[$campo];
+					if (isset($importData[$pos_campo])) {
+						if ($campo=="datanasc" || $campo=="dataassu"  || $campo=="datalice" || $campo=="datasind" || $campo=="datape" || $campo=="data")
+							$dati[$campo]=$this->data_en($importData[$pos_campo]);
+						else {	
+							$dati[$campo]=$importData[$pos_campo];
+						}
+					}
+				}
+				/*
 				foreach($infocampi['struttura'] as $campo=>$value) {
 					$pos=$infocampi['struttura'][$campo]['pos'];
 					if (isset($infocampi['struttura'][$campo]['tipo'])) {
@@ -339,6 +365,7 @@ class mainController extends Controller
 						}	
 					}				
 				}
+				*/
 
 				
 				//passaggio da array $dati ad $arr per mappatura ORM utile per l'inserimento nel DB
