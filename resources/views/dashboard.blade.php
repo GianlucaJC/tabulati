@@ -115,10 +115,13 @@
 			
 	</div>	
 	
-		<button type="submit" class="mb-3 btn btn-success">
+		<button type="submit" class="mb-3 btn btn-success" name='pub_tab' value='pub_tab'>
 			Scegli un tabulato e vai al 2° Step
 		</button>
-	
+	<hr>
+		<button type="submit" class="mb-3 btn btn-primary" name='pub_zz' value='pub_zz'>
+			Scegli un tabulato per l'aggiunta degli elementi 'ZZ'
+		</button>	
 </form>
 
 

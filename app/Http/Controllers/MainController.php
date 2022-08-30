@@ -37,11 +37,16 @@ class mainController extends Controller
 		if($request->has('sele_e')) $tb=$request->input('sele_e');
 		$file_json=$request->input('file_json');
 
-		$name=Auth::user()->name;
 		$infotab=new infotab;
 		if ($tb==null) return redirect('dashboard');
 		$reports=$infotab->reports(0,$tb);
-		return view('pubblica')->with('reports', $reports)->with('file_json', $file_json);
+		
+		if($request->has('pub_zz')) {
+			return view('pubblica_zz')->with('reports', $reports)->with('file_json', $file_json);
+			
+		} else {			
+			return view('pubblica')->with('reports', $reports)->with('file_json', $file_json);
+		}
 
 	 }
 
@@ -518,7 +523,7 @@ class mainController extends Controller
 
 
 			if ($direct_pub==null && $test==false) {
-				
+				//1.2
 			/*
 				N.B.
 				

@@ -25,6 +25,10 @@ Route::get('step2', [ 'as' => 'step2', 'uses' => 'App\Http\Controllers\MainContr
 
 Route::post('step2', [ 'as' => 'step2', 'uses' => 'App\Http\Controllers\MainController@step2'])->middleware(['auth']);
 
+
+Route::post('step_zz1', [ 'as' => 'step_zz1', 'uses' => 'App\Http\Controllers\ControllerZZ@step_zz1'])->middleware(['auth']);
+
+
 Route::get('step3', [ 'as' => 'step3', 'uses' => 'App\Http\Controllers\MainController@dashboard'])->middleware(['auth']);
 
 Route::post('step3', [ 'as' => 'step3', 'uses' => 'App\Http\Controllers\MainController@step3'])->middleware(['auth']);

@@ -121,6 +121,10 @@ $name=Auth::user()->name;
 						@yield('content_table_step3')
 						@yield('content_table_step4')
 						
+						@yield('content_table_zz')
+						@yield('content_table_zz1')
+
+						
 					</div>
 
                 </main>
