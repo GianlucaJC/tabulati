@@ -152,12 +152,11 @@ class ControllerZZ extends Controller
 		
 
 		foreach ($importData_arr as $importData) {
-
 			$azienda=$importData[$pos_azienda];
-			$num_attivi_zz=$info_azienda->num_attivi_zz($enteweb,$ref_tabulato,$azienda);
-			$calcolo_zz_ni=$this->calcolo_zz($importData,$operatori_ni,$addendi_ni,$posizioni);
-			echo "azienda $azienda: $num_attivi_zz <hr>";
+			$num_ni_richiesti=$this->calcolo_zz($importData,$operatori_ni,$addendi_ni,$posizioni);
+			$num_nspec_richiesti=$this->calcolo_zz($importData,$operatori_ni,$addendi_ni,$posizioni);
 			
+			$num_attivi_zz=$info_azienda->num_attivi_zz($enteweb,$ref_tabulato,$azienda,$num_ni_richiesti,$num_nspec_richiesti);
 		}
 
 		
@@ -177,14 +176,11 @@ class ControllerZZ extends Controller
 		$pos="pos_".strtolower($addendo);
 		
 		$res=$arr[$$pos];
-		echo "<hr>";
-		echo "$res ($pos)";
 		
 		for ($sca=1;$sca<=count($addendi)-1;$sca++) {
 			if (strlen($operatore)!=0) {
 				$pos="pos_".strtolower($addendo);
 				$cur=$arr[$$pos];
-				echo " $operatore $cur ";
 				if ($operatore=="+") $res+=$cur;
 				if ($operatore=="-") $res-=$cur;
 			}
@@ -194,12 +190,9 @@ class ControllerZZ extends Controller
 		if (strlen($operatore)!=0) {
 			$pos="pos_".strtolower($addendo);
 			$cur=$arr[$$pos];
-			echo " $operatore $cur ";
 			if ($operatore=="+") $res+=$cur;
 			if ($operatore=="-") $res-=$cur;
 		}		
-		echo "= $res";
-		echo " -------> ";
 		return $res;
 	}
 	
