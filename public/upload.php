@@ -36,11 +36,16 @@ try {
 		@unlink("$sub/".$ref_tabulato.".csv");
 		$filepath = "$sub/".$ref_tabulato.".csv";
 	}	
-	else {
+	if ($ref_aziende=="1") {
 		@unlink("$sub/".$ref_tabulato."_aziende.csv");		
 		$filepath = "$sub/".$ref_tabulato."_aziende.csv";
 	}	
-
+	
+	if ($ref_aziende=="1000") {
+		//aziende per 'ZZ'
+		@unlink("$sub/".$ref_tabulato."_zz.csv");		
+		$filepath = "$sub/".$ref_tabulato."_zz.csv";
+	}
     if (!move_uploaded_file(
         $_FILES['file']['tmp_name'],
         $filepath

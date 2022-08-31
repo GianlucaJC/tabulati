@@ -142,9 +142,12 @@ function check_iscr(chi) {
 
 function set_sezione(ref_tabulato) {
 	ref_aziende=$("#ref_aziende").prop("checked");
-	
+	ref_zz=$("#ref_zz").val();
 	ref_a=0
+	
 	if (ref_aziende==true) ref_a=1
+	if (ref_zz) ref_a=ref_zz
+
 	if ($("#body_dialog").is(":visible")) {
 		$("#body_dialog").hide(150);
 		return false;
