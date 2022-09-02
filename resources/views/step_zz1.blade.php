@@ -25,12 +25,12 @@
 	  
 		<div class="alert alert-info" role="alert">
 			Per utilizzare le formule tenere conto della seguente mappatura (da assegnare alla prima riga del CSV):<br><br>
-			<b>A</b> - <i>Addetti</i>&nbsp &nbsp 
-			<b>0</b> - <i>Non Iscritti</i>&nbsp &nbsp 
-			<b>1</b> - <i>Fillea CGIL</i>&nbsp &nbsp 
-			<b>2</b> - <i>Filca CISL</i>&nbsp &nbsp
-			<b>3</b> - <i>Feneal UIL</i>&nbsp &nbsp
-			<b>N</b> - <i>Non Specificati</i>&nbsp &nbsp
+			<b>A/TA</b> - <i>Addetti</i>&nbsp &nbsp 
+			<b>0/T0</b> - <i>Non Iscritti</i>&nbsp &nbsp 
+			<b>1/T1</b> - <i>Fillea CGIL</i>&nbsp &nbsp 
+			<b>2/T2</b> - <i>Filca CISL</i>&nbsp &nbsp
+			<b>3/T3</b> - <i>Feneal UIL</i>&nbsp &nbsp
+			<b>N/TN</b> - <i>Non Specificati</i>&nbsp &nbsp
 			
 			
 		</div>		

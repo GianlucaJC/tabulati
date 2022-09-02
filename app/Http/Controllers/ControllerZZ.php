@@ -18,20 +18,30 @@ class ControllerZZ extends Controller
 		ini_set('memory_limit', -1);
 		ini_set('max_execution_time', '-1');
 		
-		$info_azienda=new azienda;
+		$db_azienda=new azienda;
+		$infotab=new infotab;		
 		
 		$ref_tabulato=null;
 		if($request->has('ref_tabulato')) $ref_tabulato=$request->input('ref_tabulato');
 		else return redirect('step2');
+		
+		$reports=$infotab->reports(0,$ref_tabulato);
+		
+		
+		$last_zz=$db_azienda->last_zz($ref_tabulato);
+		
+		$provincia=$reports[0]->denominazione;
+		echo "$provincia - lastZZ: $last_zz <br><br>";
 		
 		$enteweb=null;
 		if($request->has('enteweb')) $enteweb=$request->input('enteweb');
 
 		$formula_ni="";
 		if($request->has('formula_ni')) $formula_ni=$request->input('formula_ni');
-		$formula_npsec="";
-		if($request->has('formula_npsec')) $formula_npsec=$request->input('	formula_npsec');
-		if (strlen($formula_ni)==0 && strlen($formula_npsec)==0) {
+		$formula_nspec="";
+		if($request->has('formula_nspec')) $formula_nspec=$request->input('formula_nspec');
+		
+		if (strlen($formula_ni)==0 && strlen($formula_nspec)==0) {
 			$response=response()->json(['status'=>'false','message'=>"Impostare almeno una formula"]);
 			return view('import_zz')->with('enteweb',$enteweb,)->with('ref_tabulato',$ref_tabulato)->with('response',$response);
 		}
@@ -64,10 +74,12 @@ class ControllerZZ extends Controller
 		//Importazione grezza di tutti i campi del csv in un array di comodo
 		while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
 			$num = count($filedata);
+			
 			if ($i == 0) {
 				$i++;
 				for ($c = 0; $c < $num; $c++) {
-					$map_campi[$filedata[$c]]=$c;
+					$indice=strtoupper($filedata[$c]);
+					$map_campi[$indice]=$c;
 				}
 
 				continue;
@@ -84,8 +96,20 @@ class ControllerZZ extends Controller
 		$no_azienda=false;
 		if (isset($map_campi['AZIENDA'])) $pos_azienda=$map_campi['AZIENDA'];
 		else $no_azienda=true;
+
+		$pos_loc_azienda=-1;
+		if (isset($map_campi['LOCAZIENDA'])) $pos_loc_azienda=$map_campi['LOCAZIENDA'];
+		$pos_via_azienda=-1;
+		if (isset($map_campi['VIAZIENDA'])) $pos_via_azienda=$map_campi['VIAZIENDA'];
+		$pos_p_iva=-1;
+		if (isset($map_campi['C2'])) $pos_p_iva=$map_campi['C2'];
+		$pos_telazi=-1;
+		if (isset($map_campi['C3'])) $pos_telazi=$map_campi['C3'];
+
 		
 		$pos_a=null;$pos_n=null;$pos_0=null;$pos_1=null;$pos_2=null;$pos_3=null;
+		$pos_ta=null;$pos_tn=null;$pos_t0=null;$pos_t1=null;$pos_t2=null;$pos_t3=null;
+		
 		if (isset($map_campi['A'])) $pos_a=$map_campi['A'];
 		if (isset($map_campi['N'])) $pos_n=$map_campi['N'];
 		if (isset($map_campi['0'])) $pos_0=$map_campi['0'];
@@ -93,25 +117,24 @@ class ControllerZZ extends Controller
 		if (isset($map_campi['2'])) $pos_2=$map_campi['2'];
 		if (isset($map_campi['3'])) $pos_3=$map_campi['3'];
 
-		if ($pos_a==null && $pos_n==null && $pos_0==null &&  $pos_1==null &&  $pos_2==null && $pos_3==null) {
+		if (isset($map_campi['TA'])) $pos_ta=$map_campi['TA'];
+		if (isset($map_campi['TN'])) $pos_tn=$map_campi['TN'];
+		if (isset($map_campi['T0'])) $pos_t0=$map_campi['T0'];
+		if (isset($map_campi['T1'])) $pos_t1=$map_campi['T1'];
+		if (isset($map_campi['T2'])) $pos_t2=$map_campi['T2'];
+		if (isset($map_campi['T3'])) $pos_t3=$map_campi['T3'];
+
+		if ($pos_a==null && $pos_n==null && $pos_0==null &&  $pos_1==null &&  $pos_2==null && $pos_3==null && $pos_ta==null && $pos_tn==null && $pos_t0==null &&  $pos_t1==null &&  $pos_t2==null && $pos_t3==null) {
 			$response=response()->json(['status'=>'false','message'=>"Non risultano colonne definite per addetti, non iscritti, etc. (utilizzare A,N,0,1,2,3)"]);
 			return view('import_zz')->with('enteweb',$enteweb,)->with('ref_tabulato',$ref_tabulato)->with('response',$response);
 		}
 		
 		if ($no_azienda==true) {
-			$response=response()->json(['status'=>'false','message'=>"Colonna Azienda non definita (utilizzare lettera 'A')"]);
+			$response=response()->json(['status'=>'false','message'=>"Colonna Azienda non definita (utilizzare alias 'AZIENDA')"]);
 			return view('import_zz')->with('enteweb',$enteweb,)->with('ref_tabulato',$ref_tabulato)->with('response',$response);
 		}		
-		
-		
-		print_r($_POST);
-		echo "<hr>";
-		echo "enteweb $enteweb<br>";
-		print_r($map_campi);
-		echo "<br><br>";
-		print_r($importData_arr);
-		echo "<hr>";
 
+		
 		$posizioni=array();
 		$posizioni['pos_a']=$pos_a;
 		$posizioni['pos_n']=$pos_n;
@@ -119,6 +142,13 @@ class ControllerZZ extends Controller
 		$posizioni['pos_1']=$pos_1;
 		$posizioni['pos_2']=$pos_2;
 		$posizioni['pos_3']=$pos_3;
+		$posizioni['pos_ta']=$pos_ta;
+		$posizioni['pos_tn']=$pos_tn;
+		$posizioni['pos_t0']=$pos_t0;
+		$posizioni['pos_t1']=$pos_t1;
+		$posizioni['pos_t2']=$pos_t2;
+		$posizioni['pos_t3']=$pos_t3;
+
 		
 		$operatori_ni=null;$addendi_ni=null;
 		if (strlen($formula_ni)!=0) {
@@ -133,8 +163,9 @@ class ControllerZZ extends Controller
 		}
 		
 		$operatori_nspec=null;$addendi_npec=null;
-		if (strlen($formula_npsec)!=0) {
-			$analisi_formula_nspec=$this->analisi_formula($formula_npsec,"Formula Non Specificati",$posizioni);
+		
+		if (strlen($formula_nspec)!=0) {
+			$analisi_formula_nspec=$this->analisi_formula($formula_nspec,"Formula Non Specificati",$posizioni);
 			if ($analisi_formula_nspec['esito']=="KO") {
 				$message=$analisi_formula_nspec['message'];
 				$response=response()->json(['status'=>'false','message'=>$message]);
@@ -143,44 +174,88 @@ class ControllerZZ extends Controller
 			$operatori_nspec=$analisi_formula_ni['operatori'];
 			$addendi_npec=$analisi_formula_ni['addendi'];
 		}
-		echo "<hr>";
-		print_r($operatori_ni);
-		echo "<br><br>";
-		print_r($addendi_ni);
-		echo "<hr>";
-
 		
-
+		echo "<h2>";
+			echo "Totale Aziende da elaborare: <b>".count($importData_arr)."</b>";
+		echo "</h2>";
+		$cont=1;
 		foreach ($importData_arr as $importData) {
 			$azienda=$importData[$pos_azienda];
-			$num_ni_richiesti=$this->calcolo_zz($importData,$operatori_ni,$addendi_ni,$posizioni);
-			$num_nspec_richiesti=$this->calcolo_zz($importData,$operatori_ni,$addendi_ni,$posizioni);
+			if (strlen($azienda)==0) continue;
+			$loc_azienda="";$via_azienda="";$p_iva="";$telazi="";
+			if ($pos_loc_azienda!=-1) $loc_azienda=$importData[$pos_loc_azienda];
+			if ($pos_via_azienda!=-1) $via_azienda=$importData[$pos_via_azienda];
+			if ($pos_p_iva!=-1) $p_iva=$importData[$pos_p_iva];
+			if ($pos_telazi!=-1) $telazi=$importData[$pos_telazi];
 			
-			$num_attivi_zz=$info_azienda->num_attivi_zz($enteweb,$ref_tabulato,$azienda,$num_ni_richiesti,$num_nspec_richiesti);
+			$info_azienda['enteweb']=$enteweb;
+			$info_azienda['ref_tabulato']=$ref_tabulato;
+			$info_azienda['azienda']=$azienda;
+			$info_azienda['loc_azienda']=$loc_azienda;
+			$info_azienda['via_azienda']=$via_azienda;
+			$info_azienda['p_iva']=$p_iva;
+			$info_azienda['telazi']=$telazi;
+			$num_ni_richiesti=0;
+			$num_nspec_richiesti=0;
+			if (strlen($formula_ni)!=0) {
+				$num_ni_richiesti=$this->calcolo_zz($info_azienda,$importData,$operatori_ni,$addendi_ni,$posizioni);
+			}
+			
+			if (strlen($formula_nspec)!=0) {
+				$num_nspec_richiesti=$this->calcolo_zz($info_azienda,$importData,$operatori_ni,$addendi_npec,$posizioni);
+
+			}
+			
+			$set_zz=$db_azienda->set_zz($cont,$provincia,$omini_sind,$anno_sind,$mese_sind,$last_zz,$info_azienda,$num_ni_richiesti,$num_nspec_richiesti);
+			$last_zz=$set_zz;
+			$cont++;
 		}
+		echo "<h3>Procedura completata!";
 
 		
 				
 	}	
 	
-	public function calcolo_zz($arr,$operatori,$addendi,$posizioni) {
+	public function calcolo_zz($info_azienda,$arr,$operatori,$addendi,$posizioni) {
+		$db_azienda=new azienda;
+		
+		$enteweb=$info_azienda['enteweb'];
+		$ref_tabulato=$info_azienda['ref_tabulato'];
+		$azienda=$info_azienda['azienda'];
+		
 		$pos_a=$posizioni['pos_a'];
 		$pos_n=$posizioni['pos_n'];
 		$pos_0=$posizioni['pos_0'];
 		$pos_1=$posizioni['pos_1'];
 		$pos_2=$posizioni['pos_2'];
 		$pos_3=$posizioni['pos_3'];
+		$pos_ta=$posizioni['pos_ta'];
+		$pos_tn=$posizioni['pos_tn'];
+		$pos_t0=$posizioni['pos_t0'];
+		$pos_t1=$posizioni['pos_t1'];
+		$pos_t2=$posizioni['pos_t2'];
+		$pos_t3=$posizioni['pos_t3'];
 		
 		$operatore="";
 		$addendo=$addendi[0];
 		$pos="pos_".strtolower($addendo);
-		
-		$res=$arr[$$pos];
+
+		if ($pos=="pos_ta" || $pos=="pos_tn" || $pos=="pos_t0" || $pos=="pos_t1" || $pos=="pos_t2" || $pos=="pos_t3") {
+			//calcolo dati dal DB e non dal CSV
+			$res=$db_azienda->get_num($info_azienda,$pos);
+		}
+		else		
+			$res=$arr[$$pos];
 		
 		for ($sca=1;$sca<=count($addendi)-1;$sca++) {
 			if (strlen($operatore)!=0) {
 				$pos="pos_".strtolower($addendo);
-				$cur=$arr[$$pos];
+				if ($pos=="pos_ta" || $pos=="pos_tn" || $pos=="pos_t0" || $pos=="pos_t1" || $pos=="pos_t2" || $pos=="pos_t3") {
+					//calcolo dati dal DB e non dal CSV
+					$cur=$db_azienda->get_num($info_azienda,$pos);
+				}
+				else
+					$cur=$arr[$$pos];
 				if ($operatore=="+") $res+=$cur;
 				if ($operatore=="-") $res-=$cur;
 			}
@@ -189,7 +264,12 @@ class ControllerZZ extends Controller
 		}
 		if (strlen($operatore)!=0) {
 			$pos="pos_".strtolower($addendo);
-			$cur=$arr[$$pos];
+			if ($pos=="pos_ta" || $pos=="pos_tn" || $pos=="pos_t0" || $pos=="pos_t1" || $pos=="pos_t2" || $pos=="pos_t3") {
+				//calcolo dati dal DB e non dal CSV
+				$cur=$db_azienda->get_num($info_azienda,$pos);
+			} else
+				$cur=$arr[$$pos];
+			
 			if ($operatore=="+") $res+=$cur;
 			if ($operatore=="-") $res-=$cur;
 		}		
@@ -203,6 +283,15 @@ class ControllerZZ extends Controller
 		$pos_1=$posizioni['pos_1'];
 		$pos_2=$posizioni['pos_2'];
 		$pos_3=$posizioni['pos_3'];
+		$pos_ta=$posizioni['pos_ta'];
+		$pos_tn=$posizioni['pos_tn'];
+		$pos_t0=$posizioni['pos_t0'];
+		$pos_t1=$posizioni['pos_t1'];
+		$pos_t2=$posizioni['pos_t2'];
+		$pos_t3=$posizioni['pos_t3'];
+
+		
+		
 		
 		$char="";
 		$operatori=array();

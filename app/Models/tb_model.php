@@ -22,6 +22,8 @@ class tb_model extends Model
 		$result = DB::update($sql);					
 	
 	}
+	
+
 
 	public function update_deco($req,$valido_da,$valido_a,$descr_agg) {
 
