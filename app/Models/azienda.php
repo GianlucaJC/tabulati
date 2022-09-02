@@ -76,13 +76,13 @@ class azienda extends Model
 			
 			if ($ciclo==1) {
 				echo "<div>";
-					echo "<i>$cont</i>) <b>$denom</b>: $num_ni_richiesti - <i>NON ISCRITTI</i>";
+					echo "<i>$cont</i>) <b>$denom</b>: <i>NON ISCRITTI</i>";
 				echo "</div>";				
 				$sind_cond="0";$num_richiesti=$num_ni_richiesti;
 			}
 			if ($ciclo==2) {
 				echo "<div>";
-					echo "<b>$denom</b>: $num_nspec_r - <i>NON SPECIFICATI</i>";
+					echo "<b>$denom</b>: <i>NON SPECIFICATI</i>";
 				echo "</div>";				
 				$sind_cond=" ";$num_richiesti=$num_nspec_r;
 			}
@@ -118,14 +118,14 @@ class azienda extends Model
 					->where('denom', $denom)
 					->where('nome','like',"%ZZZZ%")
 					->where('ente', $ente)
-					->where('sindacato', '0')
+					->where('sindacato', $sind_cond)
 					->limit($num_richiesti)
 					->update($info);			
 				
 				echo "num_garantito <b>$num_rec</b>";
 				
 				if ($num_richiesti>$num_rec) {
-					echo " <font color='red'>".$num_ni_richiesti-$num_rec."->INSERT</font>";
+					echo "  (<font color='red'>".$num_richiesti-$num_rec." --- INSERT</font>)";
 					$sindacato=$sind_cond;
 					$sind_mens5="0123456789ab";
 					for ($sca=0;$sca<=11;$sca++) {

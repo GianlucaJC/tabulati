@@ -171,8 +171,8 @@ class ControllerZZ extends Controller
 				$response=response()->json(['status'=>'false','message'=>$message]);
 				return view('import_zz')->with('enteweb',$enteweb,)->with('ref_tabulato',$ref_tabulato)->with('response',$response);
 			}
-			$operatori_nspec=$analisi_formula_ni['operatori'];
-			$addendi_npec=$analisi_formula_ni['addendi'];
+			$operatori_nspec=$analisi_formula_nspec['operatori'];
+			$addendi_npec=$analisi_formula_nspec['addendi'];
 		}
 		
 		echo "<h2>";
