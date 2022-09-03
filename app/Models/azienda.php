@@ -113,6 +113,7 @@ class azienda extends Model
 				$info['locazienda']=$loc_azienda;
 				$info['c2']=$p_iva;
 				$info['c3']=$telazi;			
+				$info['settore']="**";
 				
 				$num_rec=DB::table("anagrafe.".$ref_tabulato)
 					->where('denom', $denom)
@@ -121,6 +122,51 @@ class azienda extends Model
 					->where('sindacato', $sind_cond)
 					->limit($num_richiesti)
 					->update($info);			
+				
+
+					$resp_up =DB::table("anagrafe.".$ref_tabulato)
+					->select("id_anagr","sindacato","sind_mens5")
+					->where('settore','**')
+					->get();				
+					foreach($resp_up as $up) {
+						$id_anagr=$up->id_anagr;
+						$sindacato=$up->sindacato;
+						$sind_mens5=$up->sind_mens5;
+						//echo "<br><small>-->id_anagr $id_anagr pre $sind_mens5 </small>";
+						$pre_sind=$sind_mens5;		
+						if ($sind_mens5==null || strlen($sind_mens5)==0) {
+							$sind_mens5="0123456789ab";
+							for ($sca=0;$sca<=11;$sca++) {
+								$old=$sca;
+								if ($sca==10) $old="a";
+								if ($sca==11) $old="b";
+								if (in_array($sca,$omini_sind)) 
+									$sind_mens5=str_replace($old,$sindacato,$sind_mens5);
+								else
+									$sind_mens5=str_replace($old,"*",$sind_mens5);
+							}
+							$sind_mens5.=$anno_sind;						
+						} else {
+							
+							$str="";
+							for ($sca=0;$sca<=11;$sca++) {
+								$sub=substr($sind_mens5,$sca,1);
+								if (in_array($sca,$omini_sind)) $sub=$sindacato;
+								$str.=$sub;
+							}
+							$sind_mens5=$str.$anno_sind;
+						}
+						//echo "<small>post $sind_mens5</small>";
+						$info=array();
+						$info['sind_mens5']=$sind_mens5;
+						$info['settore']="";
+						DB::table('anagrafe.'.$ref_tabulato)
+						->where('id_anagr',$id_anagr)
+						->update($info);
+					}
+
+					
+				////////////////
 				
 				echo "num_garantito <b>$num_rec</b>";
 				
@@ -182,7 +228,9 @@ class azienda extends Model
 	}	
 	
 	function last_zz($ref_tabulato) {
+				
 		$table="anagrafe.$ref_tabulato";
+
 		$resp = DB::table($table)
 		->select('nome')
 		->where('nome','like',"%ZZZZ%")

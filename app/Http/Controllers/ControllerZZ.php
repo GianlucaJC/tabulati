@@ -26,12 +26,20 @@ class ControllerZZ extends Controller
 		else return redirect('step2');
 		
 		$reports=$infotab->reports(0,$ref_tabulato);
+
+		$table="anagrafe.$ref_tabulato";
 		
+		//inizializzazione campo settore
+		$info=array();
+		$info['settore']="";
+		DB::table($table)->update($info);
+		///////
 		
 		$last_zz=$db_azienda->last_zz($ref_tabulato);
 		
 		$provincia=$reports[0]->denominazione;
-		echo "$provincia - lastZZ: $last_zz <br><br>";
+		$time=date("H:i:s");
+		echo "$provincia - Operazione iniziata alle $time<br><br>";
 		
 		$enteweb=null;
 		if($request->has('enteweb')) $enteweb=$request->input('enteweb');
@@ -208,9 +216,14 @@ class ControllerZZ extends Controller
 			
 			$set_zz=$db_azienda->set_zz($cont,$provincia,$omini_sind,$anno_sind,$mese_sind,$last_zz,$info_azienda,$num_ni_richiesti,$num_nspec_richiesti);
 			$last_zz=$set_zz;
+			echo str_repeat(" ", 500);
+			ob_flush();
+			flush();
+
 			$cont++;
 		}
-		echo "<h3>Procedura completata!";
+		$time=date("H:i:s");
+		echo "<h3>Procedura completata ($time)!";
 
 		
 				
@@ -304,10 +317,12 @@ class ControllerZZ extends Controller
 		for ($sca=0;$sca<=count($addendi)-1;$sca++) {
 			$addendo=$addendi[$sca];
 			$pos="pos_".strtolower($addendo);
-			if (!isset($$pos) || $$pos==null) {
-				$esito="KO";
-				$message="Nella $from hai definito la colonna $addendo ma nel file CSV non hai definito la colonna relativa";
-				break;
+			if (!($pos=="pos_ta" || $pos=="pos_tn" || $pos=="pos_t0" || $pos=="pos_t1" || $pos=="pos_t2" || $pos=="pos_t3")) {
+				if (!isset($$pos) || $$pos==null) {
+					$esito="KO";
+					$message="Nella $from hai definito la colonna $addendo ma nel file CSV non hai definito la colonna relativa";
+					break;
+				}
 			}
 		}
 
