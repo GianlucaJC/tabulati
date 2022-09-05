@@ -238,7 +238,7 @@ class ControllerZZ extends Controller
 				$num_nspec_richiesti=$this->calcolo_zz($info_azienda,$importData,$operatori_ni,$addendi_npec,$posizioni);
 
 			}
-			
+			//
 			$set_zz=$db_azienda->set_zz($provincia,$omini_sind,$anno_sind,$mese_sind,$last_zz,$info_azienda,$num_ni_richiesti,$num_nspec_richiesti);
 			$last_zz=$set_zz['last_zz'];
 			
