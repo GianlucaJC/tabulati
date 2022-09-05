@@ -130,6 +130,7 @@
 											Backup Prevenitvo Pubblicazione 'ZZ'
 										@else	
 										<font color='red'>Codice Errore: <b>{{ $lista['esito'] }}</b></font>
+										@endif
 									@endif
 									
 								</td>
