@@ -721,23 +721,25 @@ class mainController extends Controller
 		
 		if (strlen($code)==0) {
 			$up_periodi="";
-			for ($sca=0;$sca<=count($omini_sind)-1;$sca++) {
-				$per=$omini_sind[$sca];
-				$per++;
-				if ($per<10) $per="0$per";
-				if (strlen($up_periodi)!=0) $up_periodi.=";";
-				$sind_ref_num="5"; //statico: sind_mens5
-				$up_periodi.=$per."/".$anno_sind.$sind_ref_num;
-			}		
-			
-			//Ricalcolo tutte le decorrenze desunte dai vari sind_mens da assegnare a infotab: leggi nota nel model tb_model->set_release()
-			$info_ente=explode(";",$enteweb);
-			for ($sca=0;$sca<=count($info_ente)-1;$sca++) {
-				$ente_up=$info_ente[$sca];			
-				$update_periodi=$tb_model->update_periodi($ref_tabulato,$up_periodi,$ente_up);
-			}	
+			//se omini_sind==null -->ripubblicazione
+			if ($omini_sind!=null) {
+				for ($sca=0;$sca<=count($omini_sind)-1;$sca++) {
+					$per=$omini_sind[$sca];
+					$per++;
+					if ($per<10) $per="0$per";
+					if (strlen($up_periodi)!=0) $up_periodi.=";";
+					$sind_ref_num="5"; //statico: sind_mens5
+					$up_periodi.=$per."/".$anno_sind.$sind_ref_num;
+				}		
+				
+				//Ricalcolo tutte le decorrenze desunte dai vari sind_mens da assegnare a infotab: leggi nota nel model tb_model->set_release()
+				$info_ente=explode(";",$enteweb);
+				for ($sca=0;$sca<=count($info_ente)-1;$sca++) {
+					$ente_up=$info_ente[$sca];			
+					$update_periodi=$tb_model->update_periodi($ref_tabulato,$up_periodi,$ente_up);
+				}	
 
-
+			}
 			
 			/*
 			//per pubblicazione dbf -->vecchi tabulati filleaoffice desktop offline

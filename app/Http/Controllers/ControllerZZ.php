@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Http\Request;
 use App\Models\schema_import;
+use App\Models\log_events;
 use App\Models\infotab;
 use App\Models\azienda;
 
@@ -19,11 +20,26 @@ class ControllerZZ extends Controller
 		ini_set('max_execution_time', '-1');
 		
 		$db_azienda=new azienda;
-		$infotab=new infotab;		
+		$infotab=new infotab;
 		
 		$ref_tabulato=null;
 		if($request->has('ref_tabulato')) $ref_tabulato=$request->input('ref_tabulato');
 		else return redirect('step2');
+		
+		$new_f=uniqid();
+		$pubblicazione=$this->export_tab($ref_tabulato,"$new_f.csv");
+
+		$id_user=Auth::user()->id;
+		$log_events = new log_events;
+		$log_events->id_user = $id_user;
+		$log_events->operazione = "Backup preventivo - calcolo ZZ";
+		$log_events->esito = 1000;
+		$log_events->nome_file = $new_f;
+		$log_events->ref_tabulato = $ref_tabulato;
+		$iii=$log_events->save();
+
+		$id_ins_log=DB::getPdo()->lastInsertId();	
+
 		
 		$reports=$infotab->reports(0,$ref_tabulato);
 
@@ -261,6 +277,14 @@ class ControllerZZ extends Controller
 		echo "Totali New Non Specificati: <b>$tot_new_spec</b><br>";
 		
 		echo "<h3>Procedura completata ($time)!";
+		$info=array();
+		$info['num_record']=$tot_up_ni+$tot_new_ni;
+		$info['tot_new']=$tot_new_ni+$tot_new_spec;
+		$info['tot_up']=$tot_up_ni+$tot_up_nspec;
+
+		DB::table("fo_admin.log_events")
+		->where('id','=',$id_ins_log)
+		->update($info);	
 
 		
 				
@@ -402,6 +426,23 @@ class ControllerZZ extends Controller
 	 }
 
 
+	public function export_tab($ref_tabulato,$new_f) {
+		$list=DB::table('anagrafe.'.$ref_tabulato)
+		->get()
+		->toArray();
+        $filename =  public_path("allegati/pubblicazioni/$new_f");
+        $handle = fopen($filename, 'w');
+		
+		
 
+		foreach ($list as $row) {
+			$arr=array();			
+			foreach ($row as $k=>$v) {
+				$arr[]=$v;
+			}
+			fputcsv($handle, $arr);
+		}
+		fclose($handle);
+	}
 
 }
