@@ -253,7 +253,7 @@ function publish () {
     if (script_fine==true) //se lanciare o meno script servizi
         url=pre_url+"sintel/index.php?token=" + token + "&enteweb=" + enteweb + "&tab_agg=" + ref_tabulato + notif 
     else
-        url=pre_url="FO/update_tab/update.php?enteweb=" + enteweb + "&tab_agg=" + ref_tabulato + notif 
+        url=pre_url+"FO/update_tab/update.php?enteweb=" + enteweb + "&tab_agg=" + ref_tabulato + notif 
 
 window.open(url); 
 

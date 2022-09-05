@@ -41,7 +41,6 @@ class ControllerZZ extends Controller
 			$log_events->nome_file = $new_f;
 			$log_events->ref_tabulato = $ref_tabulato;
 			$iii=$log_events->save();
-
 			$id_ins_log=DB::getPdo()->lastInsertId();	
 		}
 
@@ -282,22 +281,39 @@ class ControllerZZ extends Controller
 		echo "Totali New Non Specificati: <b>$tot_new_spec</b><br>";
 		
 		echo "<h3>Procedura completata ($time)!";
-		
-		if ($back_pres=="S") {
-			$info=array();
-			$info['num_record']=$tot_up_ni+$tot_new_ni;
-			$info['tot_new']=$tot_new_ni+$tot_new_spec;
-			$info['tot_up']=$tot_up_ni+$tot_up_nspec;
 
-			DB::table("fo_admin.log_events")
-			->where('id','=',$id_ins_log)
-			->update($info);
-		}
 
-		
-				
-	}	
+	 $notifs = "&notifiche=S";
+	 $notifn = "&notifiche=N";
+	 $token = "cc1055abc7bd9883721a075066b8ced1";
+	 $locale=1;
+	 $pre_url="https://www.filleaoffice.it/";
+	 
+	 
+	 if ($locale==1) {
+		$pre_url="http://localhost://";
+	 } 
+	 
+    
 	
+     $url1=$pre_url."sintel/index.php?token=$token&enteweb=$enteweb&tab_agg=$ref_tabulato".$notifn;
+     $url2=$pre_url."FO/update_tab/update.php?enteweb=$enteweb&tab_agg=$ref_tabulato".$notifn;
+	 
+	 
+	 echo "<hr>";
+	 echo "<a href='$url1' target='_blank'>Avvia prima script servizi e poi Script 
+	 FINALE - SENZA NOTIFICHE</a><br><br>";
+	 echo "<a href='$url2' target='_blank'>Avvia SOLO Script FINALE - SENZA NOTIFICHE</a>";
+
+     $url1=$pre_url."sintel/index.php?token=$token&enteweb=$enteweb&tab_agg=$ref_tabulato".$notifs;
+     $url2=$pre_url."FO/update_tab/update.php?enteweb=$enteweb&tab_agg=$ref_tabulato".$notifs;
+	 
+	 echo "<hr>";
+	 echo "<a href='$url1' target='_blank'>Avvia prima script servizi e poi Script 
+	 FINALE - CON NOTIFICHE</a><br><br>";
+	 echo "<a href='$url2' target='_blank'>Avvia SOLO Script FINALE - CON NOTIFICHE</a>";
+	 
+	}
 	public function calcolo_zz($info_azienda,$arr,$operatori,$addendi,$posizioni) {
 		$db_azienda=new azienda;
 		
