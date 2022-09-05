@@ -235,7 +235,7 @@ class ControllerZZ extends Controller
 			}
 			
 			if (strlen($formula_nspec)!=0) {
-				$num_nspec_richiesti=$this->calcolo_zz($info_azienda,$importData,$operatori_ni,$addendi_npec,$posizioni);
+				$num_nspec_richiesti=$this->calcolo_zz($info_azienda,$importData,$operatori_nspec,$addendi_npec,$posizioni);
 
 			}
 			//
