@@ -22,7 +22,19 @@
       <div class="mb-3" id='body_dialog' style='display:none'>
        
       </div>
-	  
+		
+		@if ($info_log>0)				
+			<div class="alert alert-warning" role="alert">
+				<b>Attenzione</b><hr>
+				Per la giornata di oggi esiste già un Backup per gli ZZ. 
+				Procedere comunque con un nuovo backup? 
+				<input type='radio' name='back_pres[]' class='form-check-input selee' name='back_pres' value='N' checked> No	 			
+				<input type='radio' name='back_pres[]' class='form-check-input selee' name='back_pres' value='S'> Si
+			</div>
+		@else 
+			<input type='hidden' name='back_pres' id='back_pres' value="S">
+		@endif	
+		
 		<div class="alert alert-info" role="alert">
 			Per utilizzare le formule tenere conto della seguente mappatura (da assegnare alla prima riga del CSV):<br><br>
 			<b>A/TA</b> - <i>Addetti</i>&nbsp &nbsp 

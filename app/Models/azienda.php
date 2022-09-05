@@ -26,7 +26,7 @@ class azienda extends Model
 		$resp = DB::table("anagrafe.".$ref_tabulato)
 		->select('*')
 		->where('ente','=',$ente)
-		->where('denom','=',$azienda);
+		->where('denom','=',$azienda)
 		->where('attivi','=',"S");
 		if ($pos!="pos_ta") $resp->where('sindacato','=',$sind);
 		$r=$resp->count();

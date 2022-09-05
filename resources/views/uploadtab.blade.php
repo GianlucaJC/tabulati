@@ -127,10 +127,9 @@
 										@endif	
 									@else
 										@if ($lista['esito']=="1000") 
-											Backup preventivo Pubblicazione 'ZZ'
+											Backup Prevenitvo Pubblicazione 'ZZ'
 										@else	
-											<font color='red'>Codice Errore: <b>{{ $lista['esito'] }}</b></font>
-										@endif
+										<font color='red'>Codice Errore: <b>{{ $lista['esito'] }}</b></font>
 									@endif
 									
 								</td>

@@ -26,19 +26,24 @@ class ControllerZZ extends Controller
 		if($request->has('ref_tabulato')) $ref_tabulato=$request->input('ref_tabulato');
 		else return redirect('step2');
 		
-		$new_f=uniqid();
-		$pubblicazione=$this->export_tab($ref_tabulato,"$new_f.csv");
+		$back_pres="N";
+		if($request->has('back_pres')) $back_pres=$request->input('back_pres');
 
-		$id_user=Auth::user()->id;
-		$log_events = new log_events;
-		$log_events->id_user = $id_user;
-		$log_events->operazione = "Backup preventivo - calcolo ZZ";
-		$log_events->esito = 1000;
-		$log_events->nome_file = $new_f;
-		$log_events->ref_tabulato = $ref_tabulato;
-		$iii=$log_events->save();
+		if ($back_pres=="S") {
+			$new_f=uniqid();
+			$pubblicazione=$this->export_tab($ref_tabulato,"$new_f.csv");
 
-		$id_ins_log=DB::getPdo()->lastInsertId();	
+			$id_user=Auth::user()->id;
+			$log_events = new log_events;
+			$log_events->id_user = $id_user;
+			$log_events->operazione = "Backup preventivo - calcolo ZZ";
+			$log_events->esito = 1000;
+			$log_events->nome_file = $new_f;
+			$log_events->ref_tabulato = $ref_tabulato;
+			$iii=$log_events->save();
+
+			$id_ins_log=DB::getPdo()->lastInsertId();	
+		}
 
 		
 		$reports=$infotab->reports(0,$ref_tabulato);
@@ -277,14 +282,17 @@ class ControllerZZ extends Controller
 		echo "Totali New Non Specificati: <b>$tot_new_spec</b><br>";
 		
 		echo "<h3>Procedura completata ($time)!";
-		$info=array();
-		$info['num_record']=$tot_up_ni+$tot_new_ni;
-		$info['tot_new']=$tot_new_ni+$tot_new_spec;
-		$info['tot_up']=$tot_up_ni+$tot_up_nspec;
+		
+		if ($back_pres=="S") {
+			$info=array();
+			$info['num_record']=$tot_up_ni+$tot_new_ni;
+			$info['tot_new']=$tot_new_ni+$tot_new_spec;
+			$info['tot_up']=$tot_up_ni+$tot_up_nspec;
 
-		DB::table("fo_admin.log_events")
-		->where('id','=',$id_ins_log)
-		->update($info);	
+			DB::table("fo_admin.log_events")
+			->where('id','=',$id_ins_log)
+			->update($info);
+		}
 
 		
 				
@@ -330,7 +338,7 @@ class ControllerZZ extends Controller
 				}
 				else
 					$cur=$arr[$$pos];
-				if ($operatore=="+") $res+=$cur;
+				if ($nf=="+") $res+=$cur;
 				if ($operatore=="-") $res-=$cur;
 			}
 			if (isset($operatori[$sca-1])) $operatore=$operatori[$sca-1];
@@ -403,10 +411,21 @@ class ControllerZZ extends Controller
 	}
 	
 	public function step_zz1(Request $request) {
+		$today=date("Y-m-d");
+
+
+		$log_events = new log_events;
+		
+		$info_log=$log_events->select('*')
+		->where("esito","=",1000)
+		->whereDate('created_at','=',$today)
+		->count();
+		
+
 		$infotab=new infotab;		
 		$sele_x="";
 		if($request->has('sele_x')) $sele_x=$request->input('sele_x');
-
+		
 		$detail_tab="";
 		$req=$request->get('sele_x');
 		$ref_tabulato="";$enteweb="";
@@ -422,7 +441,7 @@ class ControllerZZ extends Controller
 			$ref_pub[$detail[0]->descr_ce]=$detail[0]->denominazione;
 		}
 
-		return view('step_zz1')->with('sele_x',$sele_x)->with('ref_tabulato',$ref_tabulato)->with('enteweb',$enteweb)->with('ref_pub',$ref_pub);
+		return view('step_zz1')->with('sele_x',$sele_x)->with('ref_tabulato',$ref_tabulato)->with('enteweb',$enteweb)->with('ref_pub',$ref_pub)->with('info_log',$info_log);
 	 }
 
 
