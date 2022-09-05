@@ -35,7 +35,7 @@ class azienda extends Model
 	}		
 
 
-	public function set_zz($cont,$provincia,$omini_sind,$anno_sind,$mese_sind,$last_zz,$info_azienda,$num_ni_richiesti,$num_nspec_r) {
+	public function set_zz($provincia,$omini_sind,$anno_sind,$mese_sind,$last_zz,$info_azienda,$num_ni_richiesti,$num_nspec_r) {
 		
 		$data=trim($anno_sind)."-".$mese_sind."-01 00:00:00";
 		$mese="";
@@ -69,25 +69,20 @@ class azienda extends Model
 			$p_iva=$zeri.$p_iva;
 		}
 		$sind_cond="-";$num_richiesti=0;
-		
+		$num_garantito_ni=0;$num_garantito_nspec=0;
+		$num_ins_ni=0;$num_ins_nspec=0;
 		for ($ciclo=1;$ciclo<=2;$ciclo++) {
 			if ($ciclo==1 && $num_ni_richiesti==0) continue;
 			if ($ciclo==2 && $num_nspec_r==0) continue;
 			
 			if ($ciclo==1) {
-				echo "<div>";
-					echo "<i>$cont</i>) <b>$denom</b>: <i>NON ISCRITTI</i>";
-				echo "</div>";				
 				$sind_cond="0";$num_richiesti=$num_ni_richiesti;
 			}
 			if ($ciclo==2) {
-				echo "<div>";
-					echo "<b>$denom</b>: <i>NON SPECIFICATI</i>";
-				echo "</div>";				
 				$sind_cond=" ";$num_richiesti=$num_nspec_r;
 			}
-			echo "num_richiesti <b>$num_richiesti</b> ";
-			$resp=0;
+			
+			
 			if ($num_richiesti!=0) {
 				$info=array();
 				$info['attivi']="N";
@@ -132,7 +127,7 @@ class azienda extends Model
 						$id_anagr=$up->id_anagr;
 						$sindacato=$up->sindacato;
 						$sind_mens5=$up->sind_mens5;
-						//echo "<br><small>-->id_anagr $id_anagr pre $sind_mens5 </small>";
+						
 						$pre_sind=$sind_mens5;		
 						if ($sind_mens5==null || strlen($sind_mens5)==0) {
 							$sind_mens5="0123456789ab";
@@ -156,7 +151,7 @@ class azienda extends Model
 							}
 							$sind_mens5=$str.$anno_sind;
 						}
-						//echo "<small>post $sind_mens5</small>";
+						
 						$info=array();
 						$info['sind_mens5']=$sind_mens5;
 						$info['settore']="";
@@ -168,10 +163,18 @@ class azienda extends Model
 					
 				////////////////
 				
-				echo "num_garantito <b>$num_rec</b>";
+				//echo "num_garantito <b>$num_rec</b>";
+				if ($ciclo==1)
+					$num_garantito_ni=$num_rec;
+				if ($ciclo==2)
+					$num_garantito_nspec=$num_rec;
 				
 				if ($num_richiesti>$num_rec) {
-					echo "  (<font color='red'>".$num_richiesti-$num_rec." --- INSERT</font>)";
+					if ($ciclo==1)
+						$num_ins_ni=$num_richiesti-$num_rec;
+					if ($ciclo==2)
+						$num_ins_nspec=$num_richiesti-$num_rec;
+
 					$sindacato=$sind_cond;
 					$sind_mens5="0123456789ab";
 					for ($sca=0;$sca<=11;$sca++) {
@@ -220,11 +223,17 @@ class azienda extends Model
 					}
 
 				}
-				echo "<hr>";
 			}
 		}
 
-		return $last_zz;		
+		$resp['last_zz']=$last_zz;
+		$resp['num_garantito_ni']=$num_garantito_ni;
+		$resp['num_garantito_nspec']=$num_garantito_nspec;
+		$resp['num_ins_ni']=$num_ins_ni;
+		$resp['num_ins_nspec']=$num_ins_nspec;
+				
+
+		return $resp;		
 	}	
 	
 	function last_zz($ref_tabulato) {

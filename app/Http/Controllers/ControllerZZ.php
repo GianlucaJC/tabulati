@@ -187,6 +187,10 @@ class ControllerZZ extends Controller
 			echo "Totale Aziende da elaborare: <b>".count($importData_arr)."</b>";
 		echo "</h2>";
 		$cont=1;
+		$tot_up_ni=0;
+		$tot_up_nspec=0;
+		$tot_new_ni=0;
+		$tot_new_spec=0;
 		foreach ($importData_arr as $importData) {
 			$azienda=$importData[$pos_azienda];
 			if (strlen($azienda)==0) continue;
@@ -214,15 +218,48 @@ class ControllerZZ extends Controller
 
 			}
 			
-			$set_zz=$db_azienda->set_zz($cont,$provincia,$omini_sind,$anno_sind,$mese_sind,$last_zz,$info_azienda,$num_ni_richiesti,$num_nspec_richiesti);
-			$last_zz=$set_zz;
-			echo str_repeat(" ", 500);
-			ob_flush();
-			flush();
+			$set_zz=$db_azienda->set_zz($provincia,$omini_sind,$anno_sind,$mese_sind,$last_zz,$info_azienda,$num_ni_richiesti,$num_nspec_richiesti);
+			$last_zz=$set_zz['last_zz'];
+			
+			$num_garantito_ni=$set_zz['num_garantito_ni'];
+			$num_ins_ni=$set_zz['num_ins_ni'];
+			$num_garantito_nspec=$set_zz['num_garantito_nspec'];
+			$num_ins_nspec=$set_zz['num_ins_nspec'];
+			
+			$tot_up_ni+=$num_garantito_ni;
+			$tot_new_ni+=$num_ins_ni;
+			$tot_up_nspec+=$num_garantito_nspec;
+			$tot_new_spec+=$num_ins_nspec;
+			
+			echo "<hr><h4>$cont) $azienda</h4>";
+			if ($num_ni_richiesti!=0) {
+				echo "<u>NON Iscritti</u>: Richiesti <b>$num_ni_richiesti</b> Numero garantito <b>$num_garantito_ni</b>";
+				if ($num_ins_ni!=0)
+					echo "  (<font color='red'>".$num_ins_ni." --- INSERT</font>)";
+				echo "<br>";
+			}				
+			if ($num_nspec_richiesti!=0) {
+				echo "<u>NON Specificati</u>:  Richiesti <b>$num_nspec_richiesti</b> Numero garantito <b>$num_garantito_nspec</b>";
+				if ($num_ins_nspec!=0)
+					echo "  (<font color='red'>".$num_ins_nspec." --- INSERT</font>)";
+				echo "<br>";
+			}				
+			
+			if ($cont/50==intval($cont/50)) {
+				echo str_repeat(" ", 500);
+				ob_flush();
+				flush();
+			}
 
 			$cont++;
 		}
 		$time=date("H:i:s");
+		echo "<hr><br><br><br><br>";
+		echo "Totali Aggiornati Non Iscritti: <b>$tot_up_ni</b><br>";
+		echo "Totali New Non Iscritti: <b>$tot_new_ni</b><br>";
+		echo "Totali Aggiornati Non Specificati: <b>$tot_up_nspec</b><br>";
+		echo "Totali New Non Specificati: <b>$tot_new_spec</b><br>";
+		
 		echo "<h3>Procedura completata ($time)!";
 
 		
