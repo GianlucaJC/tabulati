@@ -153,9 +153,35 @@ class mainController extends Controller
 		$test=false;
 		if($request->has('test_import') && $request->input('test_import')=="test") $test=true;
 		
+		$repub_tab=false;
+		if($request->has('repub_tab') && $request->input('repub_tab')=="1") $repub_tab=true;
+
 		$ref_tabulato=null;
 		if($request->has('ref_tabulato')) $ref_tabulato=$request->input('ref_tabulato');
 		else return redirect('step2');
+		
+		
+		if ($repub_tab==false) {
+			$new_f=uniqid();
+			
+			$pubblicazione=$this->export_tab($ref_tabulato,"$new_f.csv");
+			$info_up="Backup-Preventivo prima della pubblicazione";
+			if($request->has('info_up')) $info_up=$request->get('info_up');
+			
+			
+			$id_user=Auth::user()->id;
+			$log_events = new log_events;
+			$log_events->id_user = $id_user;
+			$log_events->operazione = $info_up;
+			$log_events->nome_file = $new_f;
+			$log_events->esito = 2000;
+			$log_events->num_record = -1;
+			$log_events->tot_new = -1;
+			$log_events->tot_up = -1;
+			$log_events->ref_tabulato = $ref_tabulato;
+			$log_events->save();
+		}
+		
 		
 		$enteweb=null;
 		if($request->has('enteweb')) $enteweb=$request->input('enteweb');
@@ -775,30 +801,32 @@ class mainController extends Controller
 		else
 			$response=response()->json(['status'=>'false','message'=>$code."-".$message]);		
 		
-		$new_f=uniqid();
-		if ($test==false) {
-			//salvataggio csv di input
-			@copy("allegati/$ref_tabulato.csv","allegati/all_upload/$new_f.csv");
-			@unlink("allegati/$ref_tabulato.csv");
+		
+		if ($repub_tab==false) {
+			$new_f=uniqid();
+			if ($test==false) {
+				//salvataggio csv di input
+				@copy("allegati/$ref_tabulato.csv","allegati/all_upload/$new_f.csv");
+				@unlink("allegati/$ref_tabulato.csv");
+			}
+			
+			$pubblicazione=$this->export_tab($ref_tabulato,"$new_f.csv");
+			$info_up="";
+			if($request->has('info_up')) $info_up=$request->get('info_up');
+			if ($test==true) $info_up="TEST - ".$info_up;
+			
+			$id_user=Auth::user()->id;
+			$log_events = new log_events;
+			$log_events->id_user = $id_user;
+			$log_events->operazione = $info_up;
+			$log_events->esito = $code;
+			$log_events->nome_file = $new_f;
+			$log_events->ref_tabulato = $ref_tabulato;
+			$log_events->num_record = $j;
+			$log_events->tot_new = $tot_new;
+			$log_events->tot_up = $tot_up;
+			$log_events->save();			
 		}
-		
-		$pubblicazione=$this->export_tab($ref_tabulato,"$new_f.csv");
-		$info_up="";
-		if($request->has('info_up')) $info_up=$request->get('info_up');
-		if ($test==true) $info_up="TEST - ".$info_up;
-		
-		$id_user=Auth::user()->id;
-		$log_events = new log_events;
-		$log_events->id_user = $id_user;
-		$log_events->operazione = $info_up;
-		$log_events->esito = $code;
-		$log_events->nome_file = $new_f;
-		$log_events->ref_tabulato = $ref_tabulato;
-		$log_events->num_record = $j;
-		$log_events->tot_new = $tot_new;
-		$log_events->tot_up = $tot_up;
-		$log_events->save();			
-		
 		
 		$dati=array();
 		if ($test==true) {	

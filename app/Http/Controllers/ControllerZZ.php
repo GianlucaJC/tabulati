@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Http\Request;
 use App\Models\schema_import;
-use App\Models\log_events;
 use App\Models\infotab;
 use App\Models\azienda;
 
@@ -26,24 +25,6 @@ class ControllerZZ extends Controller
 		if($request->has('ref_tabulato')) $ref_tabulato=$request->input('ref_tabulato');
 		else return redirect('step2');
 		
-		$back_pres="N";
-		if($request->has('back_pres')) $back_pres=$request->input('back_pres');
-
-		if ($back_pres=="S") {
-			$new_f=uniqid();
-			$pubblicazione=$this->export_tab($ref_tabulato,"$new_f.csv");
-
-			$id_user=Auth::user()->id;
-			$log_events = new log_events;
-			$log_events->id_user = $id_user;
-			$log_events->operazione = "Backup preventivo - calcolo ZZ";
-			$log_events->esito = 1000;
-			$log_events->nome_file = $new_f;
-			$log_events->ref_tabulato = $ref_tabulato;
-			$iii=$log_events->save();
-			$id_ins_log=DB::getPdo()->lastInsertId();	
-		}
-
 		
 		$reports=$infotab->reports(0,$ref_tabulato);
 
@@ -286,7 +267,7 @@ class ControllerZZ extends Controller
 	 $notifs = "&notifiche=S";
 	 $notifn = "&notifiche=N";
 	 $token = "cc1055abc7bd9883721a075066b8ced1";
-	 $locale=1;
+	 $locale=0;
 	 $pre_url="https://www.filleaoffice.it/";
 	 
 	 
@@ -430,17 +411,12 @@ class ControllerZZ extends Controller
 		$today=date("Y-m-d");
 
 
-		$log_events = new log_events;
-		
-		$info_log=$log_events->select('*')
-		->where("esito","=",1000)
-		->whereDate('created_at','=',$today)
-		->count();
-		
 
 		$infotab=new infotab;		
 		$sele_x="";
 		if($request->has('sele_x')) $sele_x=$request->input('sele_x');
+		else return redirect('step2');		
+		
 		
 		$detail_tab="";
 		$req=$request->get('sele_x');
@@ -457,27 +433,11 @@ class ControllerZZ extends Controller
 			$ref_pub[$detail[0]->descr_ce]=$detail[0]->denominazione;
 		}
 
-		return view('step_zz1')->with('sele_x',$sele_x)->with('ref_tabulato',$ref_tabulato)->with('enteweb',$enteweb)->with('ref_pub',$ref_pub)->with('info_log',$info_log);
+
+		return view('step_zz1')->with('sele_x',$sele_x)->with('ref_tabulato',$ref_tabulato)->with('enteweb',$enteweb)->with('ref_pub',$ref_pub);
 	 }
 
 
-	public function export_tab($ref_tabulato,$new_f) {
-		$list=DB::table('anagrafe.'.$ref_tabulato)
-		->get()
-		->toArray();
-        $filename =  public_path("allegati/pubblicazioni/$new_f");
-        $handle = fopen($filename, 'w');
-		
-		
 
-		foreach ($list as $row) {
-			$arr=array();			
-			foreach ($row as $k=>$v) {
-				$arr[]=$v;
-			}
-			fputcsv($handle, $arr);
-		}
-		fclose($handle);
-	}
 
 }
