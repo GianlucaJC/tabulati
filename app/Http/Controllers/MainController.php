@@ -50,7 +50,7 @@ class mainController extends Controller
 
 	 }
 
-
+	//
 	 public function step_riattiva(Request $request) {
 		$tb_model = new tb_model;
 		$resp=$tb_model->set_release($request);
