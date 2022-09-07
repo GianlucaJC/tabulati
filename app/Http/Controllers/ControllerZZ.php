@@ -343,7 +343,7 @@ class ControllerZZ extends Controller
 				}
 				else
 					$cur=$arr[$$pos];
-				if ($nf=="+") $res+=$cur;
+				if ($operatore=="+") $res+=$cur;
 				if ($operatore=="-") $res-=$cur;
 			}
 			if (isset($operatori[$sca-1])) $operatore=$operatori[$sca-1];
