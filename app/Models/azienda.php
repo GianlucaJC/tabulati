@@ -101,7 +101,6 @@ class azienda extends Model
 
 				$info['attivi']="S";
 				$info['presenti']= "0";
-				//$tb_model->sind_mens5 = $sind_mens5;
 				$info['provincia']= $provincia;
 				$info['data']= $data;
 				$info['periodo']=$periodo;
@@ -121,12 +120,11 @@ class azienda extends Model
 				
 
 					$resp_up =DB::table("anagrafe.".$ref_tabulato)
-					->select("id_anagr","sindacato","sind_mens5")
+					->select("id_anagr","sind_mens5")
 					->where('settore','**')
 					->get();				
 					foreach($resp_up as $up) {
 						$id_anagr=$up->id_anagr;
-						$sindacato=$up->sindacato;
 						$sind_mens5=$up->sind_mens5;
 						
 						$pre_sind=$sind_mens5;		
@@ -137,17 +135,16 @@ class azienda extends Model
 								if ($sca==10) $old="a";
 								if ($sca==11) $old="b";
 								if (in_array($sca,$omini_sind)) 
-									$sind_mens5=str_replace($old,$sindacato,$sind_mens5);
+									$sind_mens5=str_replace($old,$sind_cond,$sind_mens5);
 								else
 									$sind_mens5=str_replace($old,"*",$sind_mens5);
 							}
 							$sind_mens5.=$anno_sind;						
 						} else {
-							
 							$str="";
 							for ($sca=0;$sca<=11;$sca++) {
 								$sub=substr($sind_mens5,$sca,1);
-								if (in_array($sca,$omini_sind)) $sub=$sindacato;
+								if (in_array($sca,$omini_sind)) $sub=$sind_cond;
 								$str.=$sub;
 							}
 							$sind_mens5=$str.$anno_sind;
