@@ -115,7 +115,6 @@ class azienda extends Model
 					foreach($resp_up as $up) {
 						$id_anagr=$up->id_anagr;
 						$sind_mens5=$up->sind_mens5;
-						echo "($id_anagr)---> pre $sind_mens5 ";
 						$pre_sind=$sind_mens5;		
 						if ($sind_mens5==null || strlen($sind_mens5)==0) {
 							$sind_mens5="0123456789ab";
@@ -129,8 +128,12 @@ class azienda extends Model
 									$sind_mens5=str_replace($old,"*",$sind_mens5);
 							}
 							$sind_mens5.=$anno_sind;
-							echo " new: $sind_mens5 <br>";							
 						} else {
+							$spazi="";
+							for ($sca=strlen($sind_mens5)+1;$sca<=16;$sca++(
+								$spazi.=" ";
+							}
+							$sind_mens5=$spazi.$sind_mens5;
 							$str="";
 							for ($sca=0;$sca<=11;$sca++) {
 								$sub=substr($sind_mens5,$sca,1);
@@ -138,9 +141,7 @@ class azienda extends Model
 								$str.=$sub;
 							}
 							$sind_mens5=$str.$anno_sind;
-							echo " up: $sind_mens5 <br>";
 						}
-						echo "<hr>";
 						$info=array();
 						$info['sind_mens5']=$sind_mens5;
 						$info['settore']="";
