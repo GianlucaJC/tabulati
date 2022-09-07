@@ -85,17 +85,6 @@ class azienda extends Model
 			
 			
 			if ($num_richiesti!=0) {
-				$info=array();
-				$info['attivi']="N";
-				//rende tutti gli zzz dell'azienda specificata ed ente e non iscritti: NON attivi
-				DB::table("anagrafe.".$ref_tabulato)
-				->where('ente','=',$ente)
-				->where('nome','like',"%ZZZZ%")
-				->where('denom','=',$denom)
-				->where('sindacato','=',$sind_cond)
-				->update($info);		
-				
-
 				//esegue l'update per numero minimo garantito
 				$info=array();
 

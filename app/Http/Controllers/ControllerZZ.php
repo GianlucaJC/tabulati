@@ -183,6 +183,14 @@ class ControllerZZ extends Controller
 			$operatori_nspec=$analisi_formula_nspec['operatori'];
 			$addendi_npec=$analisi_formula_nspec['addendi'];
 		}
+		//inizializzazione tutti non attivi
+		$info=array();
+		$info['attivi']="N";
+		DB::table("anagrafe.".$ref_tabulato)
+		->where('ente','=',$enteweb)
+		->where('nome','like',"%ZZZZ%")
+		->update($info);		
+
 		
 		echo "<h2>";
 			echo "Totale Aziende da elaborare: <b>".count($importData_arr)."</b>";
