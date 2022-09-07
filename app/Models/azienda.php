@@ -131,7 +131,7 @@ class azienda extends Model
 						} else {
 							$spazi="";
 							for ($sca=strlen($sind_mens5)+1;$sca<=16;$sca++) {
-								$spazi.=" ";
+								$spazi.="-";
 							}
 							$sind_mens5=$spazi.$sind_mens5;
 							
