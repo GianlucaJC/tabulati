@@ -130,10 +130,11 @@ class azienda extends Model
 							$sind_mens5.=$anno_sind;
 						} else {
 							$spazi="";
-							for ($sca=strlen($sind_mens5)+1;$sca<=16;$sca++(
+							for ($sca=strlen($sind_mens5)+1;$sca<=16;$sca++) {
 								$spazi.=" ";
 							}
 							$sind_mens5=$spazi.$sind_mens5;
+							
 							$str="";
 							for ($sca=0;$sca<=11;$sca++) {
 								$sub=substr($sind_mens5,$sca,1);
@@ -141,7 +142,9 @@ class azienda extends Model
 								$str.=$sub;
 							}
 							$sind_mens5=$str.$anno_sind;
+							echo " up: $sind_mens5 <br>";
 						}
+						echo "<hr>";
 						$info=array();
 						$info['sind_mens5']=$sind_mens5;
 						$info['settore']="";
