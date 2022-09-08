@@ -10,7 +10,10 @@
 					<tr>
 						<th>#</th>
 						<th>TERRITORIO</th>
+						<th>Download</th>
+						
 						<?php if (1==2) {?>
+							<th>DowloadCript</th>
 
 							<th>ENTE</th>
 							<th>DESCRIZIONE</th>
@@ -43,7 +46,23 @@
 								<td>
 									{{ $report->denominazione }}
 								</td>
+								
+								<td>
+									<button type="submit" name='btn_down' class="btn btn-outline-success">
+										Download
+									</button>
+								</td>
+
+
+								
 								<?php if (1==2) {?>
+
+									<td>
+										<button type="submit" name='btn_down' class="btn btn-outline-success">
+											DownloadCript
+										</button>								
+									</td>
+								
 									<td>
 										{{ $report->descr_ce }}
 									</td>

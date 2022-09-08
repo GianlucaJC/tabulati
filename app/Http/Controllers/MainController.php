@@ -35,10 +35,23 @@ class mainController extends Controller
 	 public function step2(Request $request) {
 		$tb=null;
 		if($request->has('sele_e')) $tb=$request->input('sele_e');
+
 		$file_json=$request->input('file_json');
 
 		$infotab=new infotab;
 		if ($tb==null) return redirect('dashboard');
+		
+		if($request->has('btn_down')) {
+			$new_f=uniqid();
+			$this->export_tab($tb,"$new_f.csv");	
+			/////////////////////////////
+			$filename =  public_path("allegati/pubblicazioni/$new_f.csv");
+			$headers = ['Content-Type: text/csv'];
+			return response()->download($filename, 'download.csv', $headers)->deleteFileAfterSend(true);
+			/////////////////////////////			
+		}
+		
+
 		$reports=$infotab->reports(0,$tb);
 		
 		if($request->has('pub_zz')) {
@@ -855,11 +868,23 @@ class mainController extends Controller
         $filename =  public_path("allegati/pubblicazioni/$new_f");
         $handle = fopen($filename, 'w');
 		
-		
-
+		$r=0;
 		foreach ($list as $row) {
+			if ($r==0) {
+				$arr=array();			
+				$r=1;
+				foreach ($row as $k=>$v) {
+					$arr[]=$k;
+				}
+				fputcsv($handle, $arr);
+			}
 			$arr=array();			
 			foreach ($row as $k=>$v) {
+				/*in caso di cript
+				if (strtoupper($k)=="NOME") {
+					$v=(chr(ord(substr($v,0,1))+1).chr(ord(substr($v,1,1))+2).chr(ord(substr($v,2,1))+3).chr(ord(substr($v,3,1))+4).chr(ord(substr($v,4,1))+5).chr(ord(substr($v,5,1))+6).chr(ord(substr($v,6,1))+7).chr(ord(substr($v,7,1))+8).chr(ord(substr($v,8,1))+9).chr(ord(substr($v,9,1))+10).chr(ord(substr($v,10,1))+9).chr(ord(substr($v,11,1))+8).chr(ord(substr($v,12,1))+7).chr(ord(substr($v,13,1))+6).chr(ord(substr($v,14,1))+5).chr(ord(substr($v,15,1))+4).chr(ord(substr($v,16,1))+3).chr(ord(substr($v,17,1))+2).chr(ord(substr($v,18,1))+1).chr(ord(substr($v,19,1))+2).chr(ord(substr($v,20,1))+3).chr(ord(substr($v,21,1))+4).chr(ord(substr($v,22,1))+5).chr(ord(substr($v,23,1))+6).chr(ord(substr($v,24,1))+7).chr(ord(substr($v,25,1))+8).chr(ord(substr($v,26,1))+9).chr(ord(substr($v,27,1))+10).chr(ord(substr($v,28,1))+9).chr(ord(substr($v,29,1))+8).chr(ord(substr($v,30,1))+7).chr(ord(substr($v,31,1))+6).chr(ord(substr($v,32,1))+5).chr(ord(substr($v,33,1))+4).chr(ord(substr($v,34,1))+3)).'*';
+				}
+				*/
 				$arr[]=$v;
 			}
 			fputcsv($handle, $arr);
