@@ -41,9 +41,12 @@ class mainController extends Controller
 		$infotab=new infotab;
 		if ($tb==null) return redirect('dashboard');
 		
-		if($request->has('btn_down')) {
+		if($request->has('btn_down') || $request->has('btn_downc')) {
 			$new_f=uniqid();
-			$this->export_tab($tb,"$new_f.csv");	
+			if($request->has('btn_down'))
+				$this->export_tab($tb,"$new_f.csv",0);
+			else
+				$this->export_tab($tb,"$new_f.csv",1);
 			/////////////////////////////
 			$filename =  public_path("allegati/pubblicazioni/$new_f.csv");
 			$headers = ['Content-Type: text/csv'];
@@ -177,7 +180,7 @@ class mainController extends Controller
 		if ($repub_tab==false) {
 			$new_f=uniqid();
 			
-			$pubblicazione=$this->export_tab($ref_tabulato,"$new_f.csv");
+			$pubblicazione=$this->export_tab($ref_tabulato,"$new_f.csv",0);
 			$info_up="Backup-Preventivo prima della pubblicazione";
 			if($request->has('info_up')) $info_up=$request->get('info_up');
 			
@@ -823,7 +826,7 @@ class mainController extends Controller
 				@unlink("allegati/$ref_tabulato.csv");
 			}
 			
-			$pubblicazione=$this->export_tab($ref_tabulato,"$new_f.csv");
+			$pubblicazione=$this->export_tab($ref_tabulato,"$new_f.csv",0);
 			$info_up="";
 			if($request->has('info_up')) $info_up=$request->get('info_up');
 			if ($test==true) $info_up="TEST - ".$info_up;
@@ -861,7 +864,7 @@ class mainController extends Controller
 
 
 
-	public function export_tab($ref_tabulato,$new_f) {
+	public function export_tab($ref_tabulato,$new_f,$cript) {
 		$list=DB::table('anagrafe.'.$ref_tabulato)
 		->get()
 		->toArray();
@@ -880,11 +883,13 @@ class mainController extends Controller
 			}
 			$arr=array();			
 			foreach ($row as $k=>$v) {
-				/*in caso di cript
-				if (strtoupper($k)=="NOME") {
-					$v=(chr(ord(substr($v,0,1))+1).chr(ord(substr($v,1,1))+2).chr(ord(substr($v,2,1))+3).chr(ord(substr($v,3,1))+4).chr(ord(substr($v,4,1))+5).chr(ord(substr($v,5,1))+6).chr(ord(substr($v,6,1))+7).chr(ord(substr($v,7,1))+8).chr(ord(substr($v,8,1))+9).chr(ord(substr($v,9,1))+10).chr(ord(substr($v,10,1))+9).chr(ord(substr($v,11,1))+8).chr(ord(substr($v,12,1))+7).chr(ord(substr($v,13,1))+6).chr(ord(substr($v,14,1))+5).chr(ord(substr($v,15,1))+4).chr(ord(substr($v,16,1))+3).chr(ord(substr($v,17,1))+2).chr(ord(substr($v,18,1))+1).chr(ord(substr($v,19,1))+2).chr(ord(substr($v,20,1))+3).chr(ord(substr($v,21,1))+4).chr(ord(substr($v,22,1))+5).chr(ord(substr($v,23,1))+6).chr(ord(substr($v,24,1))+7).chr(ord(substr($v,25,1))+8).chr(ord(substr($v,26,1))+9).chr(ord(substr($v,27,1))+10).chr(ord(substr($v,28,1))+9).chr(ord(substr($v,29,1))+8).chr(ord(substr($v,30,1))+7).chr(ord(substr($v,31,1))+6).chr(ord(substr($v,32,1))+5).chr(ord(substr($v,33,1))+4).chr(ord(substr($v,34,1))+3)).'*';
+				//in caso di cript
+				if ($cript=="1") {
+					if (strtoupper($k)=="NOME") {
+						$v=(chr(ord(substr($v,0,1))+1).chr(ord(substr($v,1,1))+2).chr(ord(substr($v,2,1))+3).chr(ord(substr($v,3,1))+4).chr(ord(substr($v,4,1))+5).chr(ord(substr($v,5,1))+6).chr(ord(substr($v,6,1))+7).chr(ord(substr($v,7,1))+8).chr(ord(substr($v,8,1))+9).chr(ord(substr($v,9,1))+10).chr(ord(substr($v,10,1))+9).chr(ord(substr($v,11,1))+8).chr(ord(substr($v,12,1))+7).chr(ord(substr($v,13,1))+6).chr(ord(substr($v,14,1))+5).chr(ord(substr($v,15,1))+4).chr(ord(substr($v,16,1))+3).chr(ord(substr($v,17,1))+2).chr(ord(substr($v,18,1))+1).chr(ord(substr($v,19,1))+2).chr(ord(substr($v,20,1))+3).chr(ord(substr($v,21,1))+4).chr(ord(substr($v,22,1))+5).chr(ord(substr($v,23,1))+6).chr(ord(substr($v,24,1))+7).chr(ord(substr($v,25,1))+8).chr(ord(substr($v,26,1))+9).chr(ord(substr($v,27,1))+10).chr(ord(substr($v,28,1))+9).chr(ord(substr($v,29,1))+8).chr(ord(substr($v,30,1))+7).chr(ord(substr($v,31,1))+6).chr(ord(substr($v,32,1))+5).chr(ord(substr($v,33,1))+4).chr(ord(substr($v,34,1))+3)).'*';
+					}
 				}
-				*/
+				
 				$arr[]=$v;
 			}
 			fputcsv($handle, $arr);
