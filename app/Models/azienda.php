@@ -90,6 +90,11 @@ class azienda extends Model
 
 				$info['attivi']="S";
 				$info['presenti']= "0";
+				
+				$info['datanasc']="2000-01-01";
+				$info['loc']=$provincia;
+				$info['pro']=substr($provincia,0,2);
+				
 				$info['provincia']= $provincia;
 				$info['data']= $data;
 				$info['periodo']=$periodo;
@@ -192,13 +197,14 @@ class azienda extends Model
 						}
 						$new_last=$str.$last_zz;
 						$nome="ZZZZZZ".$new_last.$ref;
+						$codfisc=$ref.$new_last;
 						$tb_model = new tb_model;
 						$tb_model->setTable("anagrafe.".$ref_tabulato);
 						$tb_model->nome = $nome;
 						$tb_model->datanasc = "2000-01-01";
 						$tb_model->loc = $provincia;
 						$tb_model->pro = substr($provincia,0,2);
-						$tb_model->codfisc = $nome;
+						$tb_model->codfisc = $codfisc;
 						$tb_model->denom = $denom;
 						$tb_model->ente = $ente;
 						$tb_model->attivi = "S";
