@@ -867,6 +867,7 @@ class mainController extends Controller
 	public function export_tab($ref_tabulato,$new_f,$cript) {
 		echo "T1";
 		$list=DB::table('anagrafe.'.$ref_tabulato)
+		->where('nome','like',"%gianluca%")
 		->get()
 		->toArray();
         $filename =  public_path("allegati/pubblicazioni/$new_f");
