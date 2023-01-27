@@ -865,12 +865,13 @@ class mainController extends Controller
 
 
 	public function export_tab($ref_tabulato,$new_f,$cript) {
+		echo "T1";
 		$list=DB::table('anagrafe.'.$ref_tabulato)
 		->get()
 		->toArray();
         $filename =  public_path("allegati/pubblicazioni/$new_f");
         $handle = fopen($filename, 'w');
-		
+		echo "T2";
 		$r=0;
 		foreach ($list as $row) {
 			if ($r==0) {
@@ -894,7 +895,9 @@ class mainController extends Controller
 			}
 			fputcsv($handle, $arr);
 		}
+		echo "T3";
 		fclose($handle);
+		echo "T4";
 	}
 
 	
