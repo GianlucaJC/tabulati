@@ -10,7 +10,7 @@
 	<input type='hidden' name='ref_tabulato' id='ref_tabulato' value='{{ $ref_tabulato }}'>
 	<div id='div_table_report'>
 		<h2>Stai per pubblicare:</h2><br>
-	
+
 	
 		@foreach($ref_pub as $k=>$v) 
 			<div class="alert alert-success" role="alert">

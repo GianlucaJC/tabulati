@@ -774,12 +774,15 @@ class mainController extends Controller
 					$up_periodi.=$per."/".$anno_sind.$sind_ref_num;
 				}		
 				
+				/*03.02.2023
+				Eliminato perchè integrato nella procedura finale di consolidamento - script update_tab
 				//Ricalcolo tutte le decorrenze desunte dai vari sind_mens da assegnare a infotab: leggi nota nel model tb_model->set_release()
 				$info_ente=explode(";",$enteweb);
 				for ($sca=0;$sca<=count($info_ente)-1;$sca++) {
 					$ente_up=$info_ente[$sca];			
 					$update_periodi=$tb_model->update_periodi($ref_tabulato,$up_periodi,$ente_up);
-				}	
+				}
+				*/				
 
 			}
 			
