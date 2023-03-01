@@ -498,9 +498,16 @@ class mainController extends Controller
 						$ref_mese=substr($codfisc,8,1);
 						$mm="01";
 						
+						
 						if ($gg>31) $gg=$gg-40;
-						if ($aa<20) $aa="20$aa";
-						else $aa="19$aa";
+						if ($aa<20)  {
+							if (strlen($aa)==1) $aa="0$aa";
+							$aa="20$aa";
+						}	
+						else { 
+							if (strlen($aa)==1) $aa="0$aa";						
+							$aa="19$aa";
+						}	
 						
 						if ($ref_mese=="A") $mm="01";
 						if ($ref_mese=="B") $mm="02";
@@ -514,6 +521,7 @@ class mainController extends Controller
 						if ($ref_mese=="R") $mm="10";
 						if ($ref_mese=="S") $mm="11";
 						if ($ref_mese=="T") $mm="12";
+						
 						
 						if (strlen($gg)==1) $gg="0$gg";
 						$datanasc="$aa-$mm-$gg 00:00:00";
