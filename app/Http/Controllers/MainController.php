@@ -41,11 +41,13 @@ class mainController extends Controller
 		$infotab=new infotab;
 		if ($tb==null) return redirect('dashboard');
 		
-		if($request->has('btn_down') || $request->has('btn_downc')) {
+		if($request->has('btn_down') || $request->has('btn_downzz') || $request->has('btn_downc')) {
 			$new_f=uniqid();
 			if($request->has('btn_down'))
 				$this->export_tab($tb,"$new_f.csv",0);
-			else
+			elseif($request->has('btn_downzz'))
+				$this->export_tab($tb,"$new_f.csv","zz");
+			elseif($request->has('btn_downc'))
 				$this->export_tab($tb,"$new_f.csv",1);
 			/////////////////////////////
 			$filename =  public_path("allegati/pubblicazioni/$new_f.csv");
@@ -875,13 +877,16 @@ class mainController extends Controller
 
 
 
-	public function export_tab($ref_tabulato,$new_f,$cript) {
+	public function export_tab($ref_tabulato,$new_f,$opz) {
         $filename =  public_path("allegati/pubblicazioni/$new_f");
         $handle = fopen($filename, 'w');
 		$r=0;
-		DB::table('anagrafe.'.$ref_tabulato)
+		$db=DB::table('anagrafe.'.$ref_tabulato)
+		->when($opz=="zz", function ($db) {			
+			return $db->where('nome', "like","%zzz%");
+		})		
 		->orderBy('nome')
-		->chunk(500, function($list) use ($handle,$r,$cript){
+		->chunk(500, function($list) use ($handle,$r,$opz){
 			foreach ($list as $row) {
 				
 				if ($r==0) {
@@ -895,7 +900,7 @@ class mainController extends Controller
 				$arr=array();			
 				foreach ($row as $k=>$v) {
 					//in caso di cript
-					if ($cript=="1") {
+					if ($opz=="1") {
 						if (strtoupper($k)=="NOME") {
 							$v=(chr(ord(substr($v,0,1))+1).chr(ord(substr($v,1,1))+2).chr(ord(substr($v,2,1))+3).chr(ord(substr($v,3,1))+4).chr(ord(substr($v,4,1))+5).chr(ord(substr($v,5,1))+6).chr(ord(substr($v,6,1))+7).chr(ord(substr($v,7,1))+8).chr(ord(substr($v,8,1))+9).chr(ord(substr($v,9,1))+10).chr(ord(substr($v,10,1))+9).chr(ord(substr($v,11,1))+8).chr(ord(substr($v,12,1))+7).chr(ord(substr($v,13,1))+6).chr(ord(substr($v,14,1))+5).chr(ord(substr($v,15,1))+4).chr(ord(substr($v,16,1))+3).chr(ord(substr($v,17,1))+2).chr(ord(substr($v,18,1))+1).chr(ord(substr($v,19,1))+2).chr(ord(substr($v,20,1))+3).chr(ord(substr($v,21,1))+4).chr(ord(substr($v,22,1))+5).chr(ord(substr($v,23,1))+6).chr(ord(substr($v,24,1))+7).chr(ord(substr($v,25,1))+8).chr(ord(substr($v,26,1))+9).chr(ord(substr($v,27,1))+10).chr(ord(substr($v,28,1))+9).chr(ord(substr($v,29,1))+8).chr(ord(substr($v,30,1))+7).chr(ord(substr($v,31,1))+6).chr(ord(substr($v,32,1))+5).chr(ord(substr($v,33,1))+4).chr(ord(substr($v,34,1))+3)).'*';
 						}

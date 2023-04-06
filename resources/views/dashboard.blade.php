@@ -11,6 +11,7 @@
 						<th>#</th>
 						<th>TERRITORIO</th>
 						<th>Download</th>
+						<th>DownloadZZ</th>
 						<th>DowloadCript</th>
 						
 						<?php if (1==2) {?>
@@ -51,6 +52,12 @@
 									<button type="submit" name='btn_down' class="btn btn-outline-success">
 										Download
 									</button>
+								</td>
+
+								<td>
+									<button type="submit" name='btn_downzz' class="btn btn-outline-success">
+										DownloadZZ
+									</button>								
 								</td>
 
 								<td>
