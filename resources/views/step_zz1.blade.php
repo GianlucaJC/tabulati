@@ -10,7 +10,7 @@
 
 	<input type='hidden' name='ref_tabulato' id='ref_tabulato' value='{{ $ref_tabulato }}'>
 	<input type='hidden' name='ref_zz' id='ref_zz' value='1000'>
-	<div id='div_table_report'>
+	
 		<h2>Stai per aggiornare/inserire i 'ZZ' in:</h2><br>
 	
 		@foreach($ref_pub as $k=>$v) 
@@ -45,15 +45,36 @@
 		<button class="mb-3 ml-3 btn btn-outline-secondary" onclick="history.go(-1);">Indietro </button>		
 		
 		
-		
-		
 		<div id="div_altre_opzioni">
 			<div id='div_calcoli'>
-				<label for="formula_ni">Formula N.Iscritti</label>
-				<input type="text" class="form-control" id="formula_ni" name="formula_ni" aria-describedby="Formula per non iscritti" placeholder="FormulaNI" value="" style='width:250px'><br>
-				<label for="formula_nspec">Formula N.Spec</label>
-				<input type="text" class="form-control" id="formula_nspec" name="formula_nspec" aria-describedby="Formula per non specificati" placeholder="FormulaNSPEC" value="" style='width:250px'>
-				
+	
+				<div class="row mb-3">
+					<div class="col-md-3">
+						<div class="form-floating">
+							<input type="text" class="form-control" id="formula_ni" name="formula_ni" aria-describedby="Formula per non iscritti" placeholder="FormulaNI" value=""> 
+							<label for="formula_ni">Formula N.Iscritti</label>
+						</div>
+						
+					</div>
+					<div class="col-md-3">
+						<div class="form-floating mb-3 mb-md-0">
+							<input type="text" class="form-control" id="formula_nspec" name="formula_nspec" aria-describedby="Formula per non specificati" placeholder="FormulaNSPEC" value="" >
+							<label for="formula_nspec">Formula N.Spec</label>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div class="form-floating mb-3 mb-md-0">
+							<input type="text" class="form-control" id="formula_filca" name="formula_filca" aria-describedby="Formula per Filca" placeholder="FormulaFILCA" value="" >
+							<label for="formula_filca">Formula Filca</label>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div class="form-floating mb-3 mb-md-0">
+							<input type="text" class="form-control" id="formula_feneal" name="formula_feneal" aria-describedby="Formula per Feneal" placeholder="FormulaFENEAL" value="" >
+							<label for="formula_feneal">Formula Feneal</label>
+						</div>
+					</div>					
+				</div>
 			</div>
 				
 

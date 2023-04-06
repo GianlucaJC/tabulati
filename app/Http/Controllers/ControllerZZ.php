@@ -48,9 +48,14 @@ class ControllerZZ extends Controller
 		$formula_ni="";
 		if($request->has('formula_ni')) $formula_ni=$request->input('formula_ni');
 		$formula_nspec="";
-		if($request->has('formula_nspec')) $formula_nspec=$request->input('formula_nspec');
+		if($request->has('formula_nspec')) $formula_nspec=$request->input('formula_nspec');		
+		$formula_filca="";
+		if($request->has('formula_filca')) $formula_filca=$request->input('formula_filca');
+		$formula_feneal="";
+		if($request->has('formula_feneal')) $formula_feneal=$request->input('formula_feneal');
+
 		
-		if (strlen($formula_ni)==0 && strlen($formula_nspec)==0) {
+		if (strlen($formula_ni)==0 && strlen($formula_nspec)==0 && strlen($formula_filca)==0 && strlen($formula_feneal)==0) {
 			$response=response()->json(['status'=>'false','message'=>"Impostare almeno una formula"]);
 			return view('import_zz')->with('enteweb',$enteweb,)->with('ref_tabulato',$ref_tabulato)->with('response',$response);
 		}
@@ -183,6 +188,32 @@ class ControllerZZ extends Controller
 			$operatori_nspec=$analisi_formula_nspec['operatori'];
 			$addendi_npec=$analisi_formula_nspec['addendi'];
 		}
+		
+		$operatori_filca=null;$addendi_filca=null;
+		
+		if (strlen($formula_filca)!=0) {
+			$analisi_formula_filca=$this->analisi_formula($formula_filca,"Formula Filca",$posizioni);
+			if ($analisi_formula_filca['esito']=="KO") {
+				$message=$analisi_formula_filca['message'];
+				$response=response()->json(['status'=>'false','message'=>$message]);
+				return view('import_zz')->with('enteweb',$enteweb,)->with('ref_tabulato',$ref_tabulato)->with('response',$response);
+			}
+			$operatori_filca=$analisi_formula_filca['operatori'];
+			$addendi_filca=$analisi_formula_filca['addendi'];
+		}
+		
+		$operatori_feneal=null;$addendi_feneal=null;
+		if (strlen($formula_feneal)!=0) {
+			$analisi_formula_feneal=$this->analisi_formula($formula_feneal,"Formula Feneal",$posizioni);
+			if ($analisi_formula_feneal['esito']=="KO") {
+				$message=$analisi_formula_feneal['message'];
+				$response=response()->json(['status'=>'false','message'=>$message]);
+				return view('import_zz')->with('enteweb',$enteweb,)->with('ref_tabulato',$ref_tabulato)->with('response',$response);
+			}
+			$operatori_feneal=$analisi_formula_feneal['operatori'];
+			$addendi_feneal=$analisi_formula_feneal['addendi'];
+		}
+
 		//inizializzazione tutti non attivi
 		$info=array();
 		$info['attivi']="N";
@@ -197,9 +228,20 @@ class ControllerZZ extends Controller
 		echo "</h2>";
 		$cont=1;
 		$tot_up_ni=0;
-		$tot_up_nspec=0;
 		$tot_new_ni=0;
+
 		$tot_new_spec=0;
+		$tot_up_nspec=0;
+		
+		$tot_new_filca=0;
+		$tot_up_filca=0;
+
+		$tot_new_feneal=0;
+		$tot_up_feneal=0;
+
+
+		
+		
 		foreach ($importData_arr as $importData) {
 			$azienda=$importData[$pos_azienda];
 			if (strlen($azienda)==0) continue;
@@ -218,6 +260,8 @@ class ControllerZZ extends Controller
 			$info_azienda['telazi']=$telazi;
 			$num_ni_richiesti=0;
 			$num_nspec_richiesti=0;
+			$num_filca_richiesti=0;
+			$num_feneal_richiesti=0;
 			if (strlen($formula_ni)!=0) {
 				$num_ni_richiesti=$this->calcolo_zz($info_azienda,$importData,$operatori_ni,$addendi_ni,$posizioni);
 			}
@@ -226,19 +270,43 @@ class ControllerZZ extends Controller
 				$num_nspec_richiesti=$this->calcolo_zz($info_azienda,$importData,$operatori_nspec,$addendi_npec,$posizioni);
 
 			}
+
+			if (strlen($formula_filca)!=0) {
+				$num_filca_richiesti=$this->calcolo_zz($info_azienda,$importData,$operatori_filca,$addendi_filca,$posizioni);
+
+			}
+
+			if (strlen($formula_feneal)!=0) {
+				$num_feneal_richiesti=$this->calcolo_zz($info_azienda,$importData,$operatori_feneal,$addendi_feneal,$posizioni);
+
+			}
+
+
 			//
-			$set_zz=$db_azienda->set_zz($provincia,$omini_sind,$anno_sind,$mese_sind,$last_zz,$info_azienda,$num_ni_richiesti,$num_nspec_richiesti);
+			$set_zz=$db_azienda->set_zz($provincia,$omini_sind,$anno_sind,$mese_sind,$last_zz,$info_azienda,$num_ni_richiesti,$num_nspec_richiesti,$num_filca_richiesti,$num_feneal_richiesti);
 			$last_zz=$set_zz['last_zz'];
 			
 			$num_garantito_ni=$set_zz['num_garantito_ni'];
 			$num_ins_ni=$set_zz['num_ins_ni'];
 			$num_garantito_nspec=$set_zz['num_garantito_nspec'];
 			$num_ins_nspec=$set_zz['num_ins_nspec'];
+			$num_garantito_filca=$set_zz['num_garantito_filca'];
+			$num_ins_filca=$set_zz['num_ins_filca'];
+			$num_garantito_feneal=$set_zz['num_garantito_feneal'];
+			$num_ins_feneal=$set_zz['num_ins_feneal'];
+
 			
 			$tot_up_ni+=$num_garantito_ni;
 			$tot_new_ni+=$num_ins_ni;
 			$tot_up_nspec+=$num_garantito_nspec;
 			$tot_new_spec+=$num_ins_nspec;
+
+			$tot_up_filca+=$num_garantito_filca;
+			$tot_new_filca+=$num_ins_filca;
+
+			$tot_up_feneal+=$num_garantito_feneal;
+			$tot_new_feneal+=$num_ins_feneal;			
+
 			
 			echo "<hr><h4>$cont) $azienda</h4>";
 			if ($num_ni_richiesti!=0) {
@@ -253,6 +321,20 @@ class ControllerZZ extends Controller
 					echo "  (<font color='red'>".$num_ins_nspec." --- INSERT</font>)";
 				echo "<br>";
 			}				
+
+			if ($num_filca_richiesti!=0) {
+				echo "<u>Filca</u>:  Richiesti <b>$num_filca_richiesti</b> Numero garantito <b>$num_garantito_filca</b>";
+				if ($num_ins_filca!=0)
+					echo "  (<font color='red'>".$num_ins_filca." --- INSERT</font>)";
+				echo "<br>";
+			}	
+
+			if ($num_feneal_richiesti!=0) {
+				echo "<u>Feneal</u>:  Richiesti <b>$num_feneal_richiesti</b> Numero garantito <b>$num_garantito_feneal</b>";
+				if ($num_ins_feneal!=0)
+					echo "  (<font color='red'>".$num_ins_feneal." --- INSERT</font>)";
+				echo "<br>";
+			}	
 			
 			if ($cont/50==intval($cont/50)) {
 				echo str_repeat(" ", 500);
@@ -268,6 +350,11 @@ class ControllerZZ extends Controller
 		echo "Totali New Non Iscritti: <b>$tot_new_ni</b><br>";
 		echo "Totali Aggiornati Non Specificati: <b>$tot_up_nspec</b><br>";
 		echo "Totali New Non Specificati: <b>$tot_new_spec</b><br>";
+		echo "Totali Aggiornati Filca: <b>$tot_up_filca</b><br>";
+		echo "Totali New Filca: <b>$tot_new_filca</b><br>";
+		echo "Totali Aggiornati Feneal: <b>$tot_up_feneal</b><br>";
+		echo "Totali New Feneal: <b>$tot_new_feneal</b><br>";
+
 		
 		echo "<h3>Procedura completata ($time)!";
 
@@ -327,6 +414,7 @@ class ControllerZZ extends Controller
 		$addendo=$addendi[0];
 		$pos="pos_".strtolower($addendo);
 
+
 		if ($pos=="pos_ta" || $pos=="pos_tn" || $pos=="pos_t0" || $pos=="pos_t1" || $pos=="pos_t2" || $pos=="pos_t3") {
 			//calcolo dati dal DB e non dal CSV
 			$res=$db_azienda->get_num($info_azienda,$pos);
@@ -334,6 +422,7 @@ class ControllerZZ extends Controller
 		else		
 			$res=$arr[$$pos];
 		
+	
 		for ($sca=1;$sca<=count($addendi)-1;$sca++) {
 			if (strlen($operatore)!=0) {
 				$pos="pos_".strtolower($addendo);

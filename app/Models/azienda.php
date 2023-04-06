@@ -36,7 +36,7 @@ class azienda extends Model
 	}		
 
 
-	public function set_zz($provincia,$omini_sind,$anno_sind,$mese_sind,$last_zz,$info_azienda,$num_ni_richiesti,$num_nspec_r) {
+	public function set_zz($provincia,$omini_sind,$anno_sind,$mese_sind,$last_zz,$info_azienda,$num_ni_richiesti,$num_nspec_r,$num_filca_richiesti,$num_feneal_richiesti) {
 		
 		$data=trim($anno_sind)."-".$mese_sind."-01 00:00:00";
 		$mese="";
@@ -71,10 +71,13 @@ class azienda extends Model
 		}
 		$sind_cond="-";$num_richiesti=0;
 		$num_garantito_ni=0;$num_garantito_nspec=0;
-		$num_ins_ni=0;$num_ins_nspec=0;
-		for ($ciclo=1;$ciclo<=2;$ciclo++) {
+		$num_garantito_filca=0;$num_garantito_feneal=0;
+		$num_ins_ni=0;$num_ins_nspec=0;$num_ins_filca=0;$num_ins_feneal=0;
+		for ($ciclo=1;$ciclo<=4;$ciclo++) {
 			if ($ciclo==1 && $num_ni_richiesti==0) continue;
 			if ($ciclo==2 && $num_nspec_r==0) continue;
+			if ($ciclo==3 && $num_filca_richiesti==0) continue;
+			if ($ciclo==4 && $num_feneal_richiesti==0) continue;
 			
 			if ($ciclo==1) {
 				$sind_cond="0";$num_richiesti=$num_ni_richiesti;
@@ -82,7 +85,12 @@ class azienda extends Model
 			if ($ciclo==2) {
 				$sind_cond=" ";$num_richiesti=$num_nspec_r;
 			}
-			
+			if ($ciclo==3) {
+				$sind_cond="2";$num_richiesti=$num_filca_richiesti;
+			}			
+			if ($ciclo==4) {
+				$sind_cond="3";$num_richiesti=$num_feneal_richiesti;
+			}
 			
 			if ($num_richiesti!=0) {
 				//esegue l'update per numero minimo garantito
@@ -164,12 +172,20 @@ class azienda extends Model
 					$num_garantito_ni=$num_rec;
 				if ($ciclo==2)
 					$num_garantito_nspec=$num_rec;
+				if ($ciclo==3)
+					$num_garantito_filca=$num_rec;
+				if ($ciclo==4)
+					$num_garantito_feneal=$num_rec;
 				
 				if ($num_richiesti>$num_rec) {
 					if ($ciclo==1)
 						$num_ins_ni=$num_richiesti-$num_rec;
 					if ($ciclo==2)
 						$num_ins_nspec=$num_richiesti-$num_rec;
+					if ($ciclo==3)
+						$num_ins_filca=$num_richiesti-$num_rec;
+					if ($ciclo==4)
+						$num_ins_feneal=$num_richiesti-$num_rec;
 
 					$sindacato=$sind_cond;
 					$sind_mens5="0123456789ab";
@@ -233,8 +249,13 @@ class azienda extends Model
 		$resp['last_zz']=$last_zz;
 		$resp['num_garantito_ni']=$num_garantito_ni;
 		$resp['num_garantito_nspec']=$num_garantito_nspec;
+		$resp['num_garantito_filca']=$num_garantito_filca;
+		$resp['num_garantito_feneal']=$num_garantito_feneal;
+		
 		$resp['num_ins_ni']=$num_ins_ni;
 		$resp['num_ins_nspec']=$num_ins_nspec;
+		$resp['num_ins_filca']=$num_ins_filca;
+		$resp['num_ins_feneal']=$num_ins_feneal;
 				
 
 		return $resp;		
