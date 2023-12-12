@@ -318,7 +318,7 @@ class mainController extends Controller
 				(`nome`, `datanasc`, `ente` ) 
 				SELECT nome,datanasc,ente 
 				FROM `anagrafe`.t4_lazi_a 
-				WHERE c3='1'"
+				WHERE c3='1'");
 		}
 		
 		if ($direct_pub==null) {
