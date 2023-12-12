@@ -309,6 +309,18 @@ class mainController extends Controller
 			ref:https://github.com/laravel/framework/discussions/38260
 		*/
 		
+		if (strtoupper($ref_tabulato=="T4_LAZI_A")) {
+			//calcolo nuovi assunti: per ROMA
+			$anagrafe = DB::table('rm_office.t4_lazi_a')->truncate();
+			
+			DB::statement("
+			INSERT INTO `rm_office`.old_new 
+				(`nome`, `datanasc`, `ente` ) 
+				SELECT nome,datanasc,ente 
+				FROM `anagrafe`.t4_lazi_a 
+				WHERE c3='1'"
+		}
+		
 		if ($direct_pub==null) {
 			try {
 				DB::statement("ALTER TABLE `anagrafe_b`.$ref_tabulato ADD INDEX DN (datanasc)");
@@ -333,6 +345,7 @@ class mainController extends Controller
 			$anagrafe = DB::table('anagrafe_b.'.$ref_tabulato)->truncate();
 		}	
 		else {
+			
 			$anagrafe = DB::table('anagrafe.'.$ref_tabulato)->truncate();
 		}
 		
