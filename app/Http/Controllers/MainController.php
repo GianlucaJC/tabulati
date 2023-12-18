@@ -229,7 +229,7 @@ class mainController extends Controller
 		if($request->has('file_json')) $file_json=$request->input('file_json');
 		if ($direct_pub!=null) $file_json="standard.json";
 		
-		if (strtoupper($ref_tabulato)=="t4_lazi_a") $file_json="roma.json";
+		if (strtoupper($ref_tabulato)=="T4_LAZI_A") $file_json="roma.json";
 		
 		$filepath="allegati/$ref_tabulato.csv";
 		if (!file_exists($filepath)) {
