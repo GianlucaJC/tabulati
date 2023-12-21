@@ -313,14 +313,20 @@ class mainController extends Controller
 		
 		if (strtoupper($ref_tabulato=="T4_LAZI_A")) {
 			//calcolo nuovi assunti: per ROMA
-			$anagrafe = DB::table('rm_office.t4_lazi_a')->truncate();
-			
-			DB::statement("
-			INSERT INTO `rm_office`.old_new 
-				(`nome`, `datanasc`, `ente` ) 
-				SELECT nome,datanasc,ente 
-				FROM `anagrafe`.t4_lazi_a 
-				WHERE c3='1'");
+			$info_ente=explode(";",$enteweb);
+			for ($sca=0;$sca<=count($info_ente)-1;$sca++) {
+				$ente_up=$info_ente[$sca];
+				if (strlen($ente_up)>0) {
+					$dele=DB:table('rm_office.old_new')::where('ente','=',$ente_up)->delete();
+					
+					DB::statement("
+					INSERT INTO `rm_office`.old_new 
+						(`nome`, `datanasc`, `ente` ) 
+						SELECT nome,datanasc,ente 
+						FROM `anagrafe`.t4_lazi_a 
+						WHERE c3='1' and ente='$ente_up'");
+				}
+			}		
 		}
 		
 		if ($direct_pub==null) {
@@ -347,8 +353,14 @@ class mainController extends Controller
 			$anagrafe = DB::table('anagrafe_b.'.$ref_tabulato)->truncate();
 		}	
 		else {
-			
-			$anagrafe = DB::table('anagrafe.'.$ref_tabulato)->truncate();
+			$info_ente=explode(";",$enteweb);
+			for ($sca=0;$sca<=count($info_ente)-1;$sca++) {
+				$ente_up=$info_ente[$sca];
+				if (strlen($ente_up)>0) {			
+					$dele=DB:table('anagrafe.'.$ref_tabulato)::where('ente','=',$ente_up)->delete();			
+				}
+			}
+			//$anagrafe = DB::table('anagrafe.'.$ref_tabulato)->truncate();
 		}
 		
 		
@@ -395,9 +407,10 @@ class mainController extends Controller
 			*/
 			
 			$infocampi=$this->tracciato($file_json);
+			$info_ente=explode(";",$enteweb);
 			foreach ($importData_arr as $importData) {
 				
-				
+				$import_row=true;
 				//Verifica congruenza del numero campi fissato ad un minimo di 20
 				if (count($importData)<20) continue;
 				$j++;
@@ -437,6 +450,15 @@ class mainController extends Controller
 									$dati[$campo]=$this->data_en($importData[$pos]);
 								else {	
 									$dati[$campo]=$importData[$pos];
+									/*
+									verifico sem importare il dato 
+									in funzione dell'ente(i) di pubblicazione
+									*/
+									if (strtolower($campo)=="ente") {
+										if (!in_array($importData[$pos],$info_ente)) $import_row=false;
+									}
+									
+									
 
 								}	
 							}	
@@ -444,7 +466,7 @@ class mainController extends Controller
 					}
 				}
 
-				
+				if ($import_row==false) continue;
 				//passaggio da array $dati ad $arr per mappatura ORM utile per l'inserimento nel DB
 				$arr=array();
 				foreach($dati as $k=>$v) {
