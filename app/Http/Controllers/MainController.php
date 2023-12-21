@@ -317,7 +317,7 @@ class mainController extends Controller
 			for ($sca=0;$sca<=count($info_ente)-1;$sca++) {
 				$ente_up=$info_ente[$sca];
 				if (strlen($ente_up)>0) {
-					$dele=DB:table('rm_office.old_new')::where('ente','=',$ente_up)->delete();
+					$dele=DB::table('rm_office.old_new')::where('ente','=',$ente_up)->delete();
 					
 					DB::statement("
 					INSERT INTO `rm_office`.old_new 
@@ -357,7 +357,7 @@ class mainController extends Controller
 			for ($sca=0;$sca<=count($info_ente)-1;$sca++) {
 				$ente_up=$info_ente[$sca];
 				if (strlen($ente_up)>0) {			
-					$dele=DB:table('anagrafe.'.$ref_tabulato)::where('ente','=',$ente_up)->delete();			
+					$dele=DB::table('anagrafe.'.$ref_tabulato)::where('ente','=',$ente_up)->delete();			
 				}
 			}
 			//$anagrafe = DB::table('anagrafe.'.$ref_tabulato)->truncate();
