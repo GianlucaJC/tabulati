@@ -311,7 +311,7 @@ class mainController extends Controller
 			ref:https://github.com/laravel/framework/discussions/38260
 		*/
 		
-		if (strtoupper($ref_tabulato=="T4_LAZI_A")) {
+		if (strtoupper($ref_tabulato)=="T4_LAZI_A") {
 			//calcolo nuovi assunti: per ROMA
 			$info_ente=explode(";",$enteweb);
 			for ($sca=0;$sca<=count($info_ente)-1;$sca++) {
