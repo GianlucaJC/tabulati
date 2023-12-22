@@ -36,9 +36,11 @@
 		</button>	
 
 
-		<button type="submit" id='btn_procedi' name='btn_procedi' class="ml-3 mb-3 btn btn-outline-success" disabled onclick="$('#btn_procedi').prop( 'disabled', true );$('#btn_procedi_test').prop( 'disabled', true );$('#test_import').val('')">
+		<button type="submit" id='btn_procedi' name='btn_procedi' class="ml-3 mb-3 btn btn-outline-success" disabled onclick="$('#btn_procedi_test').prop( 'disabled', true );$('#test_import').val('')">
 			Procedi con l'importazione
 		</button>	
+		
+		
 		<button class="mb-3 ml-3 btn btn-outline-secondary" onclick="history.go(-1);">Indietro </button>		
 		
 		<hr>
