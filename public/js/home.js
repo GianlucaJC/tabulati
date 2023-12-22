@@ -25,6 +25,9 @@ function set_tipo_imp(value) {
 
 function re_pub(nome_file,ref_tabulato) {
 	if (!confirm("Sicuro di ripubblicare il tabulato selezionato?")) return false;
+	if (ref_tabulato=="t4_lazi_a" || ref_tabulato=="T4_LAZI_A") {
+		$("#rip_tab").val("t4_lazi_a")
+	}
 	$( "#direct_pub" ).prop( "checked", true );
 	fetch('set_repub.php', {
 		method: 'post',

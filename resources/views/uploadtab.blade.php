@@ -7,6 +7,8 @@
 <input name="_token" type="hidden" value="{{ csrf_token() }}">
 
 <input type='hidden' name='file_json' id='file_json' value='{{ $file_json }}'>
+<input type='hidden' name='rip_tab' id='rip_tab'>
+
 	<input type='hidden' name='ref_tabulato' id='ref_tabulato' value='{{ $ref_tabulato }}'>
 	<div id='div_table_report'>
 		<h2>Stai per pubblicare:</h2><br>

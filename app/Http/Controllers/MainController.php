@@ -237,6 +237,29 @@ class mainController extends Controller
 			return view('import_csv')->with('enteweb',$enteweb,)->with('ref_tabulato',$ref_tabulato)->with('response',$response);
 		}
 
+
+		$rip_tab="";
+		if($request->has('rip_tab')) $rip_tab=$request->input('rip_tab');
+		if (strtoupper($ref_tabulato)=="T4_LAZI_A" && strtoupper($rip_tab)=="T4_LAZI_A" ) {
+			//in caso di ripubblicazione di un tabulato roma
+			//ripristino i 'vecchi' nuovi assunti da old_new_bk
+			$info_ente=explode(";",$enteweb);
+			for ($sca=0;$sca<=count($info_ente)-1;$sca++) {
+				$ente_up=$info_ente[$sca];
+				if (strlen($ente_up)>0) {
+					//restore da old_new_bk
+					$dele=DB::table('rm_office.old_new')
+					->where('ente','=',$ente_up)->delete();
+					DB::statement("
+					INSERT INTO `rm_office`.old_new
+						(`nome`, `datanasc`, `ente` ) 
+						SELECT nome,datanasc,ente 
+						FROM `rm_office`.old_new_bk
+						WHERE ente='$ente_up'");
+				}		
+			}
+			
+		}
 		
 		$file = fopen($filepath, "r");
 		$importData_arr = array();
