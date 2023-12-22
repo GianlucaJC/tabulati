@@ -317,6 +317,18 @@ class mainController extends Controller
 			for ($sca=0;$sca<=count($info_ente)-1;$sca++) {
 				$ente_up=$info_ente[$sca];
 				if (strlen($ente_up)>0) {
+					//backup per eventuale ripristino
+					$dele=DB::table('rm_office.old_new_bk')
+					->where('ente','=',$ente_up)->delete();
+					DB::statement("
+					INSERT INTO `rm_office`.old_new_bk
+						(`nome`, `datanasc`, `ente` ) 
+						SELECT nome,datanasc,ente 
+						FROM `rm_office`.old_new
+						WHERE ente='$ente_up'");
+
+					
+					//aggiornamento file di appoggio per i 'vecchi' 1
 					$dele=DB::table('rm_office.old_new')
 					->where('ente','=',$ente_up)->delete();
 					
