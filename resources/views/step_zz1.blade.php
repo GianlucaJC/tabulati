@@ -39,7 +39,7 @@
 		<button type="button" name='btn_allegati' id='btn_allegati' class="mb-3 btn btn-info" data-target="#win_dialog" data-toggle="modal" onclick="$('#div_table_pub').hide(150);set_sezione('{{ $ref_tabulato }}');$('#div_altre_opzioni').show()" ><i class="fas fa-paperclip"></i> Allega File CSV delle aziende</button>			
 
 
-		<button type="submit" id='btn_procedi' name='btn_procedi' class="ml-3 mb-3 btn btn-outline-success" disabled onclick="$('#btn_procedi').prop( 'disabled', true );">
+		<button type="submit" id='btn_procedi' name='btn_procedi' class="ml-3 mb-3 btn btn-outline-success" disabled onclick="$('#btn_procedi').text( 'Attendere...' );">
 			Procedi con l'importazione
 		</button>	
 		<button class="mb-3 ml-3 btn btn-outline-secondary" onclick="history.go(-1);">Indietro </button>		
