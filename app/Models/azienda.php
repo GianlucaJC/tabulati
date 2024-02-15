@@ -29,6 +29,10 @@ class azienda extends Model
 		->where('denom','=',$azienda)
 		->where('attivi','=',"S");
 		if ($pos!="pos_ta") $resp->where('sindacato','=',$sind);
+		$view=$resp->toSql();
+		
+		$rawSql = vsprintf(str_replace(['?'], ['\'%s\''], $resp->toSql()), $resp->getBindings());
+echo $rawSql."<hr>";		
 		$r=$resp->count();
 
 		return $r;
