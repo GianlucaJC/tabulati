@@ -361,6 +361,21 @@ class mainController extends Controller
 						SELECT nome,datanasc,ente 
 						FROM `anagrafe`.t4_lazi_a 
 						WHERE c3='1' and ente='$ente_up'");
+						
+					
+					//aggiornamento file di appoggio per vecchio tabulato
+					//serve come calcolo alternativo dei nuovi assunti:
+					//invece dei sind_mens, confronto tra tabulati
+
+					$dele=DB::table('rm_office.old_tabulato')
+					->where('ente','=',$ente_up)->delete();
+					
+					
+					DB::statement("insert into 
+						`rm_office`.old_tabulato (`codfisc`, `ente`)
+						SELECT codfisc,'$ente_up'
+						FROM `anagrafe`.t4_lazi_a
+						WHERE ente='$ente_up' and length(codfisc)>0");
 				}
 			}		
 		}
@@ -835,7 +850,20 @@ class mainController extends Controller
 
 			}	
 				
-			
+			//finalizzazione nuovi assunti RM (metodo alternativo:leggi sopra)
+			if (strtoupper($ref_tabulato)=="T4_LAZI_A") {
+				//setto a 1 tutto il tabulato dell'ente da pub
+				DB::statement("UPDATE t4_lazi_a 
+					SET `no_old_tab`=1 
+					WHERE ente='$ente_up'");
+
+				//setto a zero quelli in comune tra old e new
+				DB::statement("UPDATE t4_lazi_a t
+					INNER join `rm_office`.old_tabulato o ON t.codfisc=o.codfisc
+					SET t.`no_old_tab`=0
+					WHERE t.ente='$ente_up' and o.ente='$ente_up'");
+				//i rimanenti 1 sono i nuovi assunti con metodo alternativo
+			}			
 			DB::commit();
 		} 
 		catch (\Illuminate\Database\QueryException $ex) {
