@@ -853,12 +853,12 @@ class mainController extends Controller
 			//finalizzazione nuovi assunti RM (metodo alternativo:leggi sopra)
 			if (strtoupper($ref_tabulato)=="T4_LAZI_A") {
 				//setto a 1 tutto il tabulato dell'ente da pub
-				DB::statement("UPDATE t4_lazi_a 
+				DB::statement("UPDATE `anagrafe`.t4_lazi_a 
 					SET `no_old_tab`=1 
 					WHERE ente='$ente_up'");
 
 				//setto a zero quelli in comune tra old e new
-				DB::statement("UPDATE t4_lazi_a t
+				DB::statement("UPDATE `anagrafe`.t4_lazi_a t
 					INNER join `rm_office`.old_tabulato o ON t.codfisc=o.codfisc
 					SET t.`no_old_tab`=0
 					WHERE t.ente='$ente_up' and o.ente='$ente_up'");
