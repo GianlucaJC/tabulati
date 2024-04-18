@@ -863,6 +863,7 @@ class mainController extends Controller
 					SET t.`no_old_tab`=0
 					WHERE t.ente='$ente_up' and o.ente='$ente_up'");
 				//i rimanenti 1 sono i nuovi assunti con metodo alternativo
+
 				
 			}			
 			DB::commit();
