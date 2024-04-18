@@ -863,6 +863,16 @@ class mainController extends Controller
 					SET t.`no_old_tab`=0
 					WHERE t.ente='$ente_up' and o.ente='$ente_up'");
 				//i rimanenti 1 sono i nuovi assunti con metodo alternativo
+				
+				//calcolo anche i licenziati sul vecchio tabulato
+				DB::statement("UPDATE `rm_office`.old_tabulato
+					SET `licenziato`=1
+					WHERE ente='$ente_up'");
+					
+				DB::statement("UPDATE `rm_office`.old_tabulato o 
+					INNER join `anagrafe`.t4_lazi_a t ON t.codfisc=o.codfisc
+					SET o.`licenziato`=0
+					WHERE t.ente='$ente_up' and o.ente='$ente_up'");				
 			}			
 			DB::commit();
 		} 
