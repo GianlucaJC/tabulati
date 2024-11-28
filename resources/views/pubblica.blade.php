@@ -40,18 +40,21 @@
 								$descr3=$report->descr3;
 								$descr4=$report->descr4;
 								$descr5=$report->descr5;
+								$descr_ce=$report->descr_ce;
+
+
 							?>
 							<tr>
 								<td>
-									<input type='checkbox' name='sele_x[]' class='form-check-input selee' id='s{{ $ss }}'  value='{{ $report->TB }}-{{ $report->code_CE }}' data-idref='{{ $ss }}'>
+									<input type='checkbox' name='sele_x[]' class='form-check-input selee' id='s{{ $ss }}'  value='{{ $report->TB }}-{{ $code_CE }}' data-idref='{{ $ss }}'>
 								</td>
 								<td>
 									{{ $report->denominazione }}
 								</td>
 								<td>
-									{{ $report->descr_ce }}
+									{{ $descr_ce}} code_CE {{$code_CE}}
 								</td>
-								
+
 								<td>
 									<?php
 										if (substr($descr1,0,1)==$code_CE)

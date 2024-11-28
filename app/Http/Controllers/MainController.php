@@ -90,7 +90,7 @@ class mainController extends Controller
 			if($request->has('sele_x')) $sele_x=$request->input('sele_x');
 			else return redirect('step2');
 		}	
-		
+			
 		
 		$detail_tab="";
 		$req=$request->get('sele_x');
@@ -101,19 +101,31 @@ class mainController extends Controller
 		$ref_pub=array();
 		$ref_enti=array();
 		$ref_tabulato="";$enteweb="";
+		
 		for ($sca=0;$sca<=count($req)-1;$sca++) {
 			$info=$req[$sca];
 			$arr_info=explode("-",$info);
 			$tb=$arr_info[0];$ente=$arr_info[1];
 			if (strlen($enteweb)!=0) $enteweb.=";";
 			$enteweb.=$ente;
+			
 			if ($sca==0) $ref_tabulato=$tb;
 			if (strlen($detail_tab)==0) $detail_tab.="<hr>";
-			$detail=$infotab->detail_tab($tb,$ente);
-			$ref_pub[$detail[0]->descr_ce]=$detail[0]->denominazione;
-			$ref_enti[$ente]=$detail[0]->descr_ce;
+			
+			if ($tb=="t4_cala_a") {
+				$arr[0]['descr_ce']="CASSA EDILE";
+				$arr[1]['denominazione']="CASSA EDILE TEST (CROTONE)";
+				$ref_pub["CASSA EDILE"]="CASSA EDILE TEST (CROTONE)";
+				$ref_enti["C"]="CASSA EDILE TEST (CROTONE)";				
+			}	
+			else {
+				$detail=$infotab->detail_tab($tb,$ente);
+				$ref_pub[$detail[0]->descr_ce]=$detail[0]->denominazione;
+				$ref_enti[$ente]=$detail[0]->descr_ce;
+			}
+			
 		}
-		
+				
 		if ($riattivazione==true) {
 			$c_riattiva=array();
 			if($request->has('c_riattiva')) $c_riattiva=$request->input('c_riattiva');
@@ -441,7 +453,9 @@ class mainController extends Controller
 		$code="";
 		$tot_new=-1;
 		$tot_up=-1;		
+		
 		try {
+	
 			$j=0;$message="";
 			
 
@@ -460,8 +474,8 @@ class mainController extends Controller
 			
 			$infocampi=$this->tracciato($file_json);
 			$info_ente=explode(";",$enteweb);
+
 			foreach ($importData_arr as $importData) {
-				
 				$import_row=true;
 				//Verifica congruenza del numero campi fissato ad un minimo di 20
 				if (count($importData)<20) continue;
@@ -869,6 +883,7 @@ class mainController extends Controller
 			DB::commit();
 		} 
 		catch (\Illuminate\Database\QueryException $ex) {
+			
 			$code=$ex->getCode();
 			$message=$ex->getMessage();
 			DB::rollBack();

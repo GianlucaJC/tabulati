@@ -20,16 +20,46 @@ class infotab extends Model
 		
 		$table="report.infotab as i";
 		
-		$resp = DB::table($table)
+		$r1 = DB::table($table)
 		->join('online.fo_argo as f', 'i.TB', '=', 'f.id_arch')
 		->select('i.id','i.TB','f.descr_ce', 'f.code_CE', 'f.decorrenza_tab', 'f.fine_tab','i.sigla_pr','i.denominazione','i.descr1','i.descr2','i.descr3','i.descr4','i.descr5')
-		->where('i.reserved','=',0)
 		->where('i.TB',$oper,"$tb")
+		->where(function ($query) {
+			$query->where('i.reserved','=',0)
+			->orWhere('i.TB','=',"t4_cala_a");
+		})
 		->orderBy('i.denominazione')
 		->groupBy($group)
 		->get();
+
+		$resp=array();
+		foreach ($r1 as $r) {
+			$resp[]=$r;
+		}
+
+		$resp[]=(object) array(
+            'id' => '1000',
+			'TB'=>"t4_cala_a",
+			'descr_ce'=>"TEST - Crotone:dismesso",
+			'code_CE'=>"C",
+			'decorrenza_tab'=>"2000-01-01",
+			'fine_tab'=>"2000-01-01",
+			'sigla_pr'=>"TT",
+			'denominazione'=>"Cassa Edile di TEST - Crotone:dismesso",
+			'descr1'=>"Cdescr1",
+			'descr2'=>"Xdescr2",
+			'descr3'=>"Xdescr3",
+			'descr4'=>"Xdescr4",
+			'descr5'=>"Xdescr5"
+		);
+
+
+
+	
+
 		return $resp;
 	}		
+
 	
 	public function rilasci_ente($ente,$ref_tabulato) {
 		$table="online.fo_argo as f";
