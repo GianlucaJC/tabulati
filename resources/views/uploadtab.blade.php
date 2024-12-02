@@ -25,7 +25,7 @@
 		@if ($check_fine_anno==false)
 		<div id='div_shift' class="alert alert-warning" role="alert">
 				<b>Attenzione!</b> Per questo tabulato non ancora risulta valorizzato sind_mens5 con anno corrente.
-				<button type="button" class="btn btn-primary ml-2'" onclick='shift()'>Esegui Shift anni</button>
+				<button type="button" class="btn btn-primary ml-2'" id='btn_shift' onclick='shift()'>Esegui Shift anni</button>
 		</div>
 		@endif
 

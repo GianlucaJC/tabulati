@@ -143,7 +143,7 @@ $name=Auth::user()->name;
             </div>
         </div>
 		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>		
-		<script src="{{ URL::asset('/') }}js/home.js?ver=2.79"></script>
+		<script src="{{ URL::asset('/') }}js/home.js?ver=2.80"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
         <script src="{{ URL::asset('/') }}js/scripts.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>

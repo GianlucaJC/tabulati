@@ -266,7 +266,11 @@ window.open(url);
 
 function shift() {
 	if (!confirm("Sicuri di effettuare shift anni sindmens per il tabulato scelto?")) return false
+	$( "#btn_shift" ).prop( "disabled", true );
+	$( "#btn_shift" ).text( "Attendere...");
+
 	var token = $("input[name='_token']").val();
+	
     const metaElements = document.querySelectorAll('meta[name="csrf-token"]');
     const csrf = metaElements.length > 0 ? metaElements[0].content : "";
 
@@ -287,7 +291,7 @@ function shift() {
 	})
 	.then(resp=>{
 		if (resp.header=="OK") {
-			$("#div_shift").hide();
+			$("#div_shift").remove();
 			alert("Shift eseguito con successo!")
 		} else alert("Errore occorso durante l'operazione")
 	})

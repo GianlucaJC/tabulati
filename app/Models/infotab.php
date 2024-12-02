@@ -70,7 +70,7 @@ class infotab extends Model
 	
 	public function check_nuovo_anno($ref_tabulato) {
 		$anno=date("Y");
-//$anno="2025";
+$anno="2025";
 		$table="online.fo_argo as f";
 		$resp = DB::table($table)
 		->select('f.rilasci_tabulato')

@@ -95,6 +95,16 @@ class ControllerOption extends Controller
 		$ref_tabulato=$request->input('ref_tabulato');
 		$resp=array();
 
+		DB::statement("
+			UPDATE anagrafe.$ref_tabulato a
+			SET a.sind_mens1=a.sind_mens2,a.sind_mens2=a.sind_mens3,a.sind_mens3=a.sind_mens4,a.sind_mens4=a.sind_mens5"
+		);		
+
+		DB::statement("
+			UPDATE anagrafe.$ref_tabulato a
+			SET a.sind_mens5=''"
+		);		
+
 		$resp['header']="OK";
 
 		return  json_encode($resp);
