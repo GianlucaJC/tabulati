@@ -264,5 +264,36 @@ window.open(url);
 
 }
 
+function shift() {
+	if (!confirm("Sicuri di effettuare shift anni sindmens per il tabulato scelto?")) return false
+	var token = $("input[name='_token']").val();
+    const metaElements = document.querySelectorAll('meta[name="csrf-token"]');
+    const csrf = metaElements.length > 0 ? metaElements[0].content : "";
 
+	ref_tabulato=$("#ref_tabulato").val()
+	fetch('shift', {
+		method: 'post',
+        headers: {
+          "Content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+          "X-CSRF-Token": csrf
+        },
+		body: 'operazione=shift&ref_tabulato='+ref_tabulato
+	})
+	.then(response => {
+		if (response.ok) {
+		   return response.json();
+		}
+		
+	})
+	.then(resp=>{
+		if (resp.header=="OK") {
+			$("#div_shift").hide();
+			alert("Shift eseguito con successo!")
+		} else alert("Errore occorso durante l'operazione")
+	})
+	.catch(status, err => {
+		
+		return console.log(status, err);
+	})	
+}
 

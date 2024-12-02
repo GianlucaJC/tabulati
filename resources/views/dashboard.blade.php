@@ -5,6 +5,7 @@
 <form method='post' action="{{ route('step2') }}" id='frm_pub2' name='frm_pub2' autocomplete="off">
 <input name="_token" type="hidden" value="{{ csrf_token() }}">
 	<div id='div_table_report'>
+
 			<table id="tb_report">
 				<thead>
 					<tr>

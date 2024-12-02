@@ -91,4 +91,13 @@ class ControllerOption extends Controller
 		return view('view_schema')->with('file_json',$file_json)->with('associazione',$associazione)->with('note',$note)->with('id_modello',$id_modello)->with('save',$save)->with('tipo_importazione',$tipo_importazione);
 	 }
 
+	 public function shift(Request $request) {
+		$ref_tabulato=$request->input('ref_tabulato');
+		$resp=array();
+
+		$resp['header']="OK";
+
+		return  json_encode($resp);
+	 }
+
 }

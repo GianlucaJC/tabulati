@@ -71,6 +71,18 @@ class infotab extends Model
 		return $resp;		
 	}
 	
+	public function check_nuovo_anno($ref_tabulato) {
+		$anno=date("Y");
+//$anno="2025";
+		$table="online.fo_argo as f";
+		$resp = DB::table($table)
+		->select('f.rilasci_tabulato')
+		->where('f.rilasci_tabulato','like',"%$anno%")
+		->count();
+		if ($resp>0) return true;
+		else return false;			
+	}
+
 	public function detail_tab($tb,$ente){
 		$table="report.infotab as i";
 		$resp = DB::table($table)

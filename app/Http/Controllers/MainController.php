@@ -101,7 +101,7 @@ class mainController extends Controller
 		$ref_pub=array();
 		$ref_enti=array();
 		$ref_tabulato="";$enteweb="";
-		
+		$check_fine_anno=false;
 		for ($sca=0;$sca<=count($req)-1;$sca++) {
 			$info=$req[$sca];
 			$arr_info=explode("-",$info);
@@ -110,9 +110,15 @@ class mainController extends Controller
 			$enteweb.=$ente;
 			
 			if ($sca==0) $ref_tabulato=$tb;
-			if (strlen($detail_tab)==0) $detail_tab.="<hr>";
+			if (strlen($detail_tab)==0) {
+				//check_fine anno
+				$check_fine_anno=$infotab->check_nuovo_anno($ref_tabulato);
+
+				$detail_tab.="<hr>";
+			}
 			
 			if ($tb=="t4_cala_a") {
+				$ref_tabulato="t4_cala_a";
 				$arr[0]['descr_ce']="CASSA EDILE";
 				$arr[1]['denominazione']="CASSA EDILE TEST (CROTONE)";
 				$ref_pub["CASSA EDILE"]="CASSA EDILE TEST (CROTONE)";
@@ -131,23 +137,28 @@ class mainController extends Controller
 			if($request->has('c_riattiva')) $c_riattiva=$request->input('c_riattiva');
 			$infotab=new infotab;
 			$arr_enti=explode(";",$enteweb);
+			
 			$riattiva=array();
 			for ($sca=0;$sca<=count($arr_enti)-1;$sca++) {
+				
 				$ente=$arr_enti[$sca];
 				$rilasci_ente=$infotab->rilasci_ente($ente,$ref_tabulato);		
+
 				$riattiva[$ente]['rilasci']=$rilasci_ente[0]->rilasci_tabulato;
-				
+		
 				for($s=0;$s<=count($c_riattiva)-1;$s++) {
+
 					$sind=$c_riattiva[$s];
 					$last_release=$this->last_release($ref_tabulato,$ente,$sind,$riattiva[$ente]['rilasci']);
 					$riattiva[$ente]['ultima_presenza'][]=$last_release;
 
 				}
+
 				
 				$riattiva[$ente]['denominazione']=$ref_enti[$ente];
 			}
 
-			return view('riattiva')->with('riattiva',$riattiva)->with('ref_enti',$ref_enti)->with('ref_tabulato',$ref_tabulato)->with('c_riattiva',$c_riattiva);
+			return view('riattiva')->with('riattiva',$riattiva)->with('ref_enti',$ref_enti)->with('ref_tabulato',$ref_tabulato)->with('c_riattiva',$c_riattiva)->with('check_fine_anno',$check_fine_anno);
 
 		}
 		
@@ -162,7 +173,7 @@ class mainController extends Controller
 		@unlink("allegati/".$ref_tabulato."_aziende.csv"); 
 
 		//caricamento altri tabulati già inviati
-		return view('uploadtab')->with('enteweb',$enteweb)->with('ref_pub',$ref_pub)->with('ref_tabulato',$ref_tabulato)->with('info_up', $info_up)->with('lista_tab', $lista_tab)->with('file_json', $file_json);
+		return view('uploadtab')->with('enteweb',$enteweb)->with('ref_pub',$ref_pub)->with('ref_tabulato',$ref_tabulato)->with('info_up', $info_up)->with('lista_tab', $lista_tab)->with('file_json', $file_json)->with('check_fine_anno',$check_fine_anno);
 
 	 }
 	
@@ -246,7 +257,7 @@ class mainController extends Controller
 		$filepath="allegati/$ref_tabulato.csv";
 		if (!file_exists($filepath)) {
 			$response=response()->json(['status'=>'false','message'=>"404-File di input non trovato"]);
-			return view('import_csv')->with('enteweb',$enteweb,)->with('ref_tabulato',$ref_tabulato)->with('response',$response);
+			return view('import_csv')->with('enteweb',$enteweb,)->with('ref_tabulato',$ref_tabulato)->with('response',$response)->with('test',$test);
 		}
 
 
@@ -320,21 +331,25 @@ class mainController extends Controller
 		//Importazione AZIENDE in caso di file di supporto con codici azienda!
 		$file_aziende="allegati/".$ref_tabulato."_aziende.csv";
 		$arr_azienda=array();
+
 		if (file_exists($file_aziende)) {
+			echo "ENTRATO";
 			$file = fopen($file_aziende, "r");
 			
 			//Importazione grezza di tutti i campi del csv in un array di comodo
 			while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
 				if (isset($filedata[0])) {
 					$cod_azi=$filedata[0];
-					$azienda="";$locazienda="";$viazienda="";
+					$azienda="";$locazienda="";$viazienda="";$piva="";
 					if (isset($filedata[1])) $azienda=$filedata[1];
 					if (isset($filedata[2])) $locazienda=$filedata[2];
 					if (isset($filedata[3])) $viazienda=$filedata[3];
+					if (isset($filedata[4])) $piva=$filedata[4];
 					
 					$arr_azienda[$cod_azi]['azienda']=$azienda;
 					$arr_azienda[$cod_azi]['locazienda']=$locazienda;
 					$arr_azienda[$cod_azi]['viazienda']=$viazienda;
+					$arr_azienda[$cod_azi]['piva']=$piva;
 				}
 			}
 			fclose($file);
@@ -478,20 +493,26 @@ class mainController extends Controller
 			foreach ($importData_arr as $importData) {
 				$import_row=true;
 				//Verifica congruenza del numero campi fissato ad un minimo di 20
-				if (count($importData)<20) continue;
+				//if (count($importData)<20) continue;
 				$j++;
 				$dati=array();	
 				if ($direct_pub==null) {
+					$cognome="?";$nom="?";
 					foreach ($map_campi as $campo=>$pos_campo) {
 						$pos_campo=$map_campi[$campo];
-						if (isset($importData[$pos_campo])) {
+						$dato=$importData[$pos_campo];
+						if ($campo=="cognome") $cognome=$dato;
+						if ($campo=="nom") $nom=$dato;
+						if (isset($importData[$pos_campo])) {							
 							if ($campo=="datanasc" || $campo=="dataassu"  || $campo=="datalice" || $campo=="datasind" || $campo=="datape" || $campo=="data")
-								$dati[$campo]=$this->data_en($importData[$pos_campo]);
+								$dati[$campo]=$this->data_en($dato);
 							else {	
-								$dati[$campo]=$importData[$pos_campo];
+								if (isset($infocampi['struttura'][$campo]))
+									$dati[$campo]=$dato;
 							}
 						}
 					}
+					if ($cognome!="?") $dati['nome']=strtoupper($cognome." ".$nom);
 				}
 				else {
 					foreach($infocampi['struttura'] as $campo=>$value) {
@@ -549,6 +570,7 @@ class mainController extends Controller
 							$arr['denom']=$arr_azienda[$k]['azienda'];
 							$arr['locazienda']=$arr_azienda[$k]['locazienda'];
 							$arr['viazienda']=$arr_azienda[$k]['viazienda'];
+							$arr['c2']=$arr_azienda[$k]['piva'];
 						}
 					}
 				}
@@ -591,49 +613,46 @@ class mainController extends Controller
 						}	
 					}
 				}					
-				//assenza data di nascita: tento assegnazione da codice fiscale
 				
-			
-				
-				if (array_key_exists("datanasc",$arr)) {
-					if (array_key_exists("codfisc",$arr) && strlen($arr['codfisc'])>10) {
-						$codfisc=$arr['codfisc'];
-						$aa=intval(substr($codfisc,6,2));
-						$gg=intval(substr($codfisc,9,2));
-						$ref_mese=substr($codfisc,8,1);
-						$mm="01";
-						
-						
-						if ($gg>31) $gg=$gg-40;
-						if ($aa<20)  {
-							if (strlen($aa)==1) $aa="0$aa";
-							$aa="20$aa";
-						}	
-						else { 
-							if (strlen($aa)==1) $aa="0$aa";						
-							$aa="19$aa";
-						}	
-						
-						if ($ref_mese=="A") $mm="01";
-						if ($ref_mese=="B") $mm="02";
-						if ($ref_mese=="C") $mm="03";
-						if ($ref_mese=="D") $mm="04";
-						if ($ref_mese=="E") $mm="05";
-						if ($ref_mese=="H") $mm="06";
-						if ($ref_mese=="L") $mm="07";
-						if ($ref_mese=="M") $mm="08";
-						if ($ref_mese=="P") $mm="09";
-						if ($ref_mese=="R") $mm="10";
-						if ($ref_mese=="S") $mm="11";
-						if ($ref_mese=="T") $mm="12";
-						
-						
-						if (strlen($gg)==1) $gg="0$gg";
-						$datanasc="$aa-$mm-$gg 00:00:00";
+				//tento assegnazione da codice fiscale-sovrascrive la data di nascita fornita
+				if (array_key_exists("codfisc",$arr) && strlen($arr['codfisc'])>10) {
+					$codfisc=$arr['codfisc'];
+					$aa=intval(substr($codfisc,6,2));
+					$gg=intval(substr($codfisc,9,2));
+					$ref_mese=substr($codfisc,8,1);
+					$mm="01";
+					
+					
+					if ($gg>31) $gg=$gg-40;
+					if ($aa<20)  {
+						if (strlen($aa)==1) $aa="0$aa";
+						$aa="20$aa";
+					}	
+					else { 
+						if (strlen($aa)==1) $aa="0$aa";						
+						$aa="19$aa";
+					}	
+					
+					if ($ref_mese=="A") $mm="01";
+					if ($ref_mese=="B") $mm="02";
+					if ($ref_mese=="C") $mm="03";
+					if ($ref_mese=="D") $mm="04";
+					if ($ref_mese=="E") $mm="05";
+					if ($ref_mese=="H") $mm="06";
+					if ($ref_mese=="L") $mm="07";
+					if ($ref_mese=="M") $mm="08";
+					if ($ref_mese=="P") $mm="09";
+					if ($ref_mese=="R") $mm="10";
+					if ($ref_mese=="S") $mm="11";
+					if ($ref_mese=="T") $mm="12";
+					
+					
+					if (strlen($gg)==1) $gg="0$gg";
+					$datanasc="$aa-$mm-$gg 00:00:00";
 
-						$arr['datanasc']=$datanasc;
-					}
+					$arr['datanasc']=$datanasc;
 				}
+			
 				//fine completamento dati assenti
 
 				$rowData[]=$arr;
@@ -1045,6 +1064,7 @@ class mainController extends Controller
 	 
 	public function data_en($data) {
 		$data=str_replace("/","-",$data);
+		$data=str_replace(".","-",$data);
 		$data=trim($data);
 		
 		$orig=$data;

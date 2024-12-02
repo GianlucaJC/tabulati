@@ -54,6 +54,6 @@ Route::get('dele_schema/{id_dele?}', [ 'as' => 'dele_schema', 'uses' => 'App\Htt
 
 Route::get('clona_schema/{id_clone?}', [ 'as' => 'clona_schema', 'uses' => 'App\Http\Controllers\ControllerOption@clona_schema'])->middleware(['auth']);
 
-
+Route::post('shift', [ 'as' => 'shift', 'uses' => 'App\Http\Controllers\ControllerOption@shift'])->middleware(['auth']);
 
 require __DIR__.'/auth.php';

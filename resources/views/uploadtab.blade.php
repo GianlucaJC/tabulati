@@ -4,7 +4,9 @@
 @section('content_table_step3')
 
 <form method='post' action="{{ route('step4') }}" id='frm_pub4' name='frm_pub4' autocomplete="off">
-<input name="_token" type="hidden" value="{{ csrf_token() }}">
+
+<input name="_token" type="hidden" value="{{ csrf_token() }}" id='token_csrf'>
+<meta name="csrf-token" content="{{{ csrf_token() }}}">
 
 <input type='hidden' name='file_json' id='file_json' value='{{ $file_json }}'>
 <input type='hidden' name='rip_tab' id='rip_tab'>
@@ -20,6 +22,12 @@
 			</div>
 		@endforeach
 
+		@if ($check_fine_anno==false)
+		<div id='div_shift' class="alert alert-warning" role="alert">
+				<b>Attenzione!</b> Per questo tabulato non ancora risulta valorizzato sind_mens5 con anno corrente.
+				<button type="button" class="btn btn-primary ml-2'" onclick='shift()'>Esegui Shift anni</button>
+		</div>
+		@endif
 
       <div class="mb-3" id='body_dialog' style='display:none'>
        
@@ -33,9 +41,11 @@
 
 		<input type='hidden' id='test_import' name='test_import'>
 
-		<button type="submit" id='btn_procedi_test'  class="ml-3 mb-3 btn btn-outline-success" disabled onclick="$('#btn_procedi_test').prop( 'disabled', true);$('#btn_procedi').prop( 'disabled', true);$('#test_import').val('test')";>
-			Test di importazione
-		</button>	
+		<div style='display:none'>
+			<button type="submit" id='btn_procedi_test'  class="ml-3 mb-3 btn btn-outline-success" disabled onclick="$('#btn_procedi_test').prop( 'disabled', true);$('#btn_procedi').prop( 'disabled', true);$('#test_import').val('test')";>
+				Test di importazione
+			</button>	
+		</div>
 
 
 		<button type="submit" id='btn_procedi' name='btn_procedi' class="ml-3 mb-3 btn btn-outline-success" disabled onclick="$('#btn_procedi_test').prop( 'disabled', true );$('#test_import').val('')">
