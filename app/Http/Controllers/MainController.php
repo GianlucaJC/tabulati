@@ -117,18 +117,12 @@ class mainController extends Controller
 				$detail_tab.="<hr>";
 			}
 			
-			if ($tb=="t4_cala_a") {
-				$ref_tabulato="t4_cala_a";
-				$arr[0]['descr_ce']="CASSA EDILE";
-				$arr[1]['denominazione']="CASSA EDILE TEST (CROTONE)";
-				$ref_pub["CASSA EDILE"]="CASSA EDILE TEST (CROTONE)";
-				$ref_enti["C"]="CASSA EDILE TEST (CROTONE)";				
-			}	
-			else {
-				$detail=$infotab->detail_tab($tb,$ente);
-				$ref_pub[$detail[0]->descr_ce]=$detail[0]->denominazione;
-				$ref_enti[$ente]=$detail[0]->descr_ce;
-			}
+
+			
+			$detail=$infotab->detail_tab($tb,$ente);
+			$ref_pub[$detail[0]->descr_ce]=$detail[0]->denominazione;
+			$ref_enti[$ente]=$detail[0]->descr_ce;
+		
 			
 		}
 				

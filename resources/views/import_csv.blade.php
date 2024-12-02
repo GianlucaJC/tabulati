@@ -125,13 +125,13 @@
 		<button class="mb-3 ml-3 btn btn-outline-secondary" onclick="history.go(-1);">Indietro </button>		
 			
 		@else
-			@if ($ref_tabulato!="t4_cala_a")
+			
 				<input type='checkbox' name='script_fine' class='form-check-input selee' id='script_fine' checked> Avvia prima script servizi<br>
 				<input type='checkbox' name='notifiche_attive' class='form-check-input selee' id='notifiche_attive' checked> Notifiche attive<br><br>
 				<button type="button" id='btn_pubblica' class="mb-3 btn btn-<?php echo $out;?>success" <?php echo $dis; ?> onclick='publish()'>
 					Completa la pubblicazione
 				</button>
-			@endif
+		
 		@endif
 			
 			

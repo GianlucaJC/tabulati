@@ -20,14 +20,11 @@ class infotab extends Model
 		
 		$table="report.infotab as i";
 		
-		$r1 = DB::table($table)
+		$resp = DB::table($table)
 		->join('online.fo_argo as f', 'i.TB', '=', 'f.id_arch')
 		->select('i.id','i.TB','f.descr_ce', 'f.code_CE', 'f.decorrenza_tab', 'f.fine_tab','i.sigla_pr','i.denominazione','i.descr1','i.descr2','i.descr3','i.descr4','i.descr5')
 		->where('i.TB',$oper,"$tb")
-		->where(function ($query) {
-			$query->where('i.reserved','=',0)
-			->orWhere('i.TB','=',"t4_cala_a");
-		})
+		->where('i.reserved','=',0)
 		->orderBy('i.denominazione')
 		->groupBy($group)
 		->get();
@@ -57,7 +54,7 @@ class infotab extends Model
 
 	
 
-		return $r1;
+		return $resp;
 	}		
 
 	
