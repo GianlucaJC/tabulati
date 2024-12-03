@@ -15,18 +15,29 @@
 	<div id='div_table_report'>
 		<h2>Stai per pubblicare:</h2><br>
 
-	
+		<?php $num_e=0; ?>
 		@foreach($ref_pub as $k=>$v) 
+			<?php $num_e++; ?>
 			<div class="alert alert-success" role="alert">
-				<b>{{ $v }}</b> - <i>{{ $k }}</i>
+				<?php
+					echo "<b>".$v['descrizione']."</b> - ";
+				?>
+				<i>{{ $k }}</i>
+				<?php echo " (".$v['code_CE'].")"; ?>
+
 			</div>
 		@endforeach
 
+		@if ($num_e>1)
+			<div id='div_shift' class="alert alert-warning" role="alert">
+					<b>Attenzione!</b> Avendo selezionato più di un ente, all'interno del tabulato dovrai indicare anche il campo ENTE per la distinzione (<i>questa indicazione è valida solo se NON stai pubblicando in modalità con tabulato già pronto</i>).
+			</div>
+		@endif
 		@if ($check_fine_anno==false)
-		<div id='div_shift' class="alert alert-warning" role="alert">
-				<b>Attenzione!</b> Per questo tabulato non ancora risulta valorizzato sind_mens5 con anno corrente.
-				<button type="button" class="btn btn-primary ml-2'" id='btn_shift' onclick='shift()'>Esegui Shift anni</button>
-		</div>
+			<div id='div_shift' class="alert alert-warning" role="alert">
+					<b>Attenzione!</b> Per questo tabulato non ancora risulta valorizzato sind_mens5 con anno corrente.
+					<button type="button" class="btn btn-primary ml-2'" id='btn_shift' onclick='shift()'>Esegui Shift anni</button>
+			</div>
 		@endif
 
       <div class="mb-3" id='body_dialog' style='display:none'>

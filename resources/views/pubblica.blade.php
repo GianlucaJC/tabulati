@@ -52,7 +52,7 @@
 									{{ $report->denominazione }}
 								</td>
 								<td>
-									{{ $descr_ce}} code_CE {{$code_CE}}
+									{{ $descr_ce}} 
 								</td>
 
 								<td>

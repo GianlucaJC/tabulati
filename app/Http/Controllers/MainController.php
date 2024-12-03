@@ -120,7 +120,8 @@ class mainController extends Controller
 
 			
 			$detail=$infotab->detail_tab($tb,$ente);
-			$ref_pub[$detail[0]->descr_ce]=$detail[0]->denominazione;
+			$ref_pub[$detail[0]->descr_ce]['descrizione']=$detail[0]->denominazione;
+			$ref_pub[$detail[0]->descr_ce]['code_CE']=$ente;
 			$ref_enti[$ente]=$detail[0]->descr_ce;
 		
 			
@@ -167,7 +168,7 @@ class mainController extends Controller
 		@unlink("allegati/".$ref_tabulato."_aziende.csv"); 
 
 		//caricamento altri tabulati già inviati
-		return view('uploadtab')->with('enteweb',$enteweb)->with('ref_pub',$ref_pub)->with('ref_tabulato',$ref_tabulato)->with('info_up', $info_up)->with('lista_tab', $lista_tab)->with('file_json', $file_json)->with('check_fine_anno',$check_fine_anno);
+		return view('uploadtab')->with('enteweb',$enteweb)->with('ref_enti',$ref_enti)->with('ref_pub',$ref_pub)->with('ref_tabulato',$ref_tabulato)->with('info_up', $info_up)->with('lista_tab', $lista_tab)->with('file_json', $file_json)->with('check_fine_anno',$check_fine_anno);
 
 	 }
 	
@@ -186,7 +187,7 @@ class mainController extends Controller
 		$comuni=$argo_comuni->comuni();
 		 
 		$test=false;
-		if($request->has('test_import') && $request->input('test_import')=="test") $test=true;
+		//if($request->has('test_import') && $request->input('test_import')=="test") $test=true;
 		
 		$repub_tab=false;
 		if($request->has('repub_tab') && $request->input('repub_tab')=="1") $repub_tab=true;
@@ -327,23 +328,24 @@ class mainController extends Controller
 		$arr_azienda=array();
 
 		if (file_exists($file_aziende)) {
-			echo "ENTRATO";
 			$file = fopen($file_aziende, "r");
 			
 			//Importazione grezza di tutti i campi del csv in un array di comodo
 			while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
 				if (isset($filedata[0])) {
 					$cod_azi=$filedata[0];
-					$azienda="";$locazienda="";$viazienda="";$piva="";
+					$azienda="";$locazienda="";$viazienda="";$piva="";$t_azi="";
 					if (isset($filedata[1])) $azienda=$filedata[1];
 					if (isset($filedata[2])) $locazienda=$filedata[2];
 					if (isset($filedata[3])) $viazienda=$filedata[3];
 					if (isset($filedata[4])) $piva=$filedata[4];
-					
+					if (isset($filedata[5])) $t_azi=$filedata[5];
+					//tel
 					$arr_azienda[$cod_azi]['azienda']=$azienda;
 					$arr_azienda[$cod_azi]['locazienda']=$locazienda;
 					$arr_azienda[$cod_azi]['viazienda']=$viazienda;
 					$arr_azienda[$cod_azi]['piva']=$piva;
+					$arr_azienda[$cod_azi]['telazi']=$t_azi;
 				}
 			}
 			fclose($file);
@@ -565,6 +567,7 @@ class mainController extends Controller
 							$arr['locazienda']=$arr_azienda[$k]['locazienda'];
 							$arr['viazienda']=$arr_azienda[$k]['viazienda'];
 							$arr['c2']=$arr_azienda[$k]['piva'];
+							$arr['c3']=$arr_azienda[$k]['telazi'];
 						}
 					}
 				}
@@ -724,16 +727,26 @@ class mainController extends Controller
 			*/
 
 
-
-
+				$num_e=1;
+				$info_ente=explode(";",$enteweb);
+				if (count($info_ente)>1) $num_e=2;
+				if ($num_e==1) {
+					DB::statement("
+					UPDATE anagrafe_b.$ref_tabulato 
+					SET ente='".$info_ente[0]."'"
+					);				
+				}				
+					
 				$campi_db=$this->campi_db();
 				$campi_up=$campi_db['campi_up'];
 				$up="";
 				foreach($campi_up as $campo) {
 					if (strlen($up)!=0) $up.=", "; 
-					$up.="a.attivi='S',a.$campo=b.$campo";
+					$up.="a.$campo=b.$campo";
 				}
-		
+				$up.=",a.attivi='S'";
+
+
 
 				//uso il campo settore per tener traccia di tutti i record che saranno interessati all'aggiornamento: sia nuovi che preesistenti...quindi inizializzo settore=''
 				DB::statement("
@@ -788,7 +801,7 @@ class mainController extends Controller
 					INSERT INTO anagrafe.$ref_tabulato ($ins1, attivi, settore, data)
 					SELECT $ins2, 'S', 'new', '$data'		
 					FROM anagrafe_b.$ref_tabulato b 
-					LEFT OUTER JOIN anagrafe.$ref_tabulato a on a.nome = b.nome and a.datanasc=b.datanasc and a.ente=b.ente					
+					LEFT OUTER JOIN anagrafe.$ref_tabulato a on a.nome = b.nome and a.datanasc=b.datanasc and a.ente=b.ente	
 					WHERE a.nome is null"
 				);
 
@@ -876,23 +889,26 @@ class mainController extends Controller
 
 
 			}	
-				
-			//finalizzazione nuovi assunti RM (metodo alternativo:leggi sopra)
+
+				//finalizzazione nuovi assunti RM (metodo alternativo:leggi sopra)
 			if (strtoupper($ref_tabulato)=="T4_LAZI_A") {
-				//setto a 1 tutto il tabulato dell'ente da pub
-				DB::statement("UPDATE `anagrafe`.t4_lazi_a 
-					SET `no_old_tab`=1 
-					WHERE ente='$ente_up'");
+				$info_ente=explode(";",$enteweb);
+				for ($sca=0;$sca<=count($info_ente)-1;$sca++) {
+					$ente_up=$info_ente[$sca];
+						//setto a 1 tutto il tabulato dell'ente da pub
+						DB::statement("UPDATE `anagrafe`.t4_lazi_a 
+							SET `no_old_tab`=1 
+							WHERE ente='$ente_up'");
 
-				//setto a zero quelli in comune tra old e new
-				DB::statement("UPDATE `anagrafe`.t4_lazi_a t
-					INNER join `rm_office`.old_tabulato o ON t.codfisc=o.codfisc
-					SET t.`no_old_tab`=0
-					WHERE t.ente='$ente_up' and o.ente='$ente_up'");
-				//i rimanenti 1 sono i nuovi assunti con metodo alternativo
-
-				
-			}			
+						//setto a zero quelli in comune tra old e new
+						DB::statement("UPDATE `anagrafe`.t4_lazi_a t
+							INNER join `rm_office`.old_tabulato o ON t.codfisc=o.codfisc
+							SET t.`no_old_tab`=0
+							WHERE t.ente='$ente_up' and o.ente='$ente_up'");
+						//i rimanenti 1 sono i nuovi assunti con metodo alternativo
+				}	
+			}
+			
 			DB::commit();
 		} 
 		catch (\Illuminate\Database\QueryException $ex) {
@@ -1131,10 +1147,13 @@ class mainController extends Controller
 	}
 	
 	public function campi_db() {
-			$campi_up=array('NOME','VIA','CAP','LOC','PRO','DATANASC','COMUNENASC',		'DATAASSU','DATALICE','SINDACATO','COMPSIND','DATASIND','NUMAPE','DATAPE','CODINPS','ENTE','DENOM','PROVINCIA','PERIODO','PRESENTI','LOCAZIENDA','VIAZIENDA', 'C2');
+			$ente_up="";
+			
+
+			$campi_up=array('NOME','VIA','CAP','LOC','PRO','DATANASC','COMUNENASC',	'DATAASSU','DATALICE','SINDACATO','COMPSIND','DATASIND','NUMAPE','DATAPE','CODINPS','ENTE','DENOM','PROVINCIA','PERIODO','PRESENTI','LOCAZIENDA','VIAZIENDA', 'C2');
 			$campi['campi_up']=$campi_up;
 
-			$campi_ins=array('NOME','VIA','CAP','LOC','PRO','DATANASC','COMUNENASC',	'DATAASSU','DATALICE','SINDACATO','COMPSIND','DATASIND','NUMAPE','DATAPE','CODFISC','CODINPS','ENTE','DENOM','PROVINCIA','PERIODO','PRESENTI','LOCAZIENDA','VIAZIENDA', 'C1','C2');
+			$campi_ins=array('NOME','VIA','CAP','LOC','PRO','DATANASC','COMUNENASC','DATAASSU','DATALICE','SINDACATO','COMPSIND','DATASIND','NUMAPE','DATAPE','CODFISC','CODINPS','ENTE','DENOM','PROVINCIA','PERIODO','PRESENTI','LOCAZIENDA','VIAZIENDA', 'C1','C2');
 			$campi['campi_ins']=$campi_ins;
 			return $campi;
 	}
