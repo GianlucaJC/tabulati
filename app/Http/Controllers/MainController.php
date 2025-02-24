@@ -448,8 +448,18 @@ class mainController extends Controller
 					$info_ente=explode(";",$enteweb);
 					for ($sca=0;$sca<=count($info_ente)-1;$sca++) {
 						$ente_up=$info_ente[$sca];
-						if (strlen($ente_up)>0)
-							DB::table('anagrafe.'.$ref_tabulato)->where('ente',$ente_up)->update($info);
+						//se si sta aggiornando Firenze:
+						//attenzione a non storicizzare quelli con id_import!=null
+						if (strlen($ente_up)>0) {
+							if (strtoupper($ref_tabulato)!="T2_TOSC_A")
+								DB::table('anagrafe.'.$ref_tabulato)->where('ente',$ente_up)->update($info);
+							else
+								DB::table('anagrafe.'.$ref_tabulato)
+								->where('ente',$ente_up)
+								->where("id_import","<>", null)
+								->update($info);
+								
+						}
 
 					}	
 				}
