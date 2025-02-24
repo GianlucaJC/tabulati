@@ -456,7 +456,7 @@ class mainController extends Controller
 							else
 								DB::table('anagrafe.'.$ref_tabulato)
 								->where('ente',$ente_up)
-								->where("id_import","<>", null)
+								->whereNull("id_import")
 								->update($info);
 								
 						}
