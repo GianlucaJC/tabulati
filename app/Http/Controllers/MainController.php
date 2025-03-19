@@ -430,9 +430,18 @@ class mainController extends Controller
 			$info_ente=explode(";",$enteweb);
 			for ($sca=0;$sca<=count($info_ente)-1;$sca++) {
 				$ente_up=$info_ente[$sca];
-				if (strlen($ente_up)>0) {			
-					$dele=DB::table('anagrafe.'.$ref_tabulato)
-					->where('ente','=',$ente_up)->delete();			
+				if (strlen($ente_up)>0) {	
+
+					if (strtoupper($ref_tabulato)=="T2_TOSC_A")		
+						$dele=DB::table('anagrafe.'.$ref_tabulato)
+						->where('ente','=',$ente_up)
+						->whereNull("id_import")
+						->delete();
+					else
+						$dele=DB::table('anagrafe.'.$ref_tabulato)
+						->where('ente','=',$ente_up)
+						->delete();
+
 				}
 			}
 			//$anagrafe = DB::table('anagrafe.'.$ref_tabulato)->truncate();
