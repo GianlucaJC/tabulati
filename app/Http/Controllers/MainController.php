@@ -679,13 +679,13 @@ class mainController extends Controller
                 if (count($rowData) == 500) {
 					if ($test==false) {
 						if ($direct_pub==null)
-							$this->debugBulkInsert("anagrafe_b.".$ref_tabulato, $rowData);
+							DB::table("anagrafe_b.".$ref_tabulato)->insert($rowData);
 						else
-							$this->debugBulkInsert("anagrafe.".$ref_tabulato, $rowData);
+							DB::table("anagrafe.".$ref_tabulato)->insert($rowData);
 							
 					}	
 					else
-						$this->debugBulkInsert("fo_admin.test_import", $rowData);
+						DB::table("fo_admin.test_import")->insert($rowData);
                     unset($rowData);
                 }					
 
@@ -694,7 +694,7 @@ class mainController extends Controller
 			if (isset($rowData) && count($rowData) > 0) {
 				if ($test==false) {
 					if ($direct_pub==null) {
-						$this->debugBulkInsert("anagrafe_b.".$ref_tabulato, $rowData);
+						DB::table("anagrafe_b.".$ref_tabulato)->insert($rowData);
 						//aggiorno tutte le date di nascita nulle che potrebbero dar problemi con la join dopo, usando come chiavi nome e datanasc
 						DB::statement("
 							UPDATE anagrafe_b.$ref_tabulato b
@@ -703,10 +703,10 @@ class mainController extends Controller
 						);							
 					}
 					else
-						$this->debugBulkInsert("anagrafe.".$ref_tabulato, $rowData);
+						DB::table("anagrafe.".$ref_tabulato)->insert($rowData);
 				}
 				else
-					$this->debugBulkInsert("fo_admin.test_import", $rowData);
+					DB::table("fo_admin.test_import")->insert($rowData);
 				unset($rowData);
 			}
 			
@@ -1041,35 +1041,6 @@ class mainController extends Controller
 
 	}
 	
-
-
-
-	private function debugBulkInsert($table, $rows) {
-		DB::flushQueryLog();
-		DB::enableQueryLog();
-
-		try {
-			DB::table($table)->insert($rows);
-
-			foreach (DB::getQueryLog() as $query) {
-				file_put_contents(
-					storage_path('logs/import-massive-queries.log'),
-					json_encode([
-						'table' => $table,
-						'rows' => count($rows),
-						'columns' => array_keys($rows[0]),
-						'sql' => $query['query'],
-						'bindings' => $query['bindings'],
-					], JSON_PRETTY_PRINT | JSON_INVALID_UTF8_SUBSTITUTE).PHP_EOL.PHP_EOL,
-					FILE_APPEND | LOCK_EX
-				);
-			}
-		} finally {
-			DB::disableQueryLog();
-			DB::flushQueryLog();
-		}
-	}
-
 	public function export_tab($ref_tabulato,$new_f,$opz) {
         $filename =  public_path("allegati/pubblicazioni/$new_f");
         $handle = fopen($filename, 'w');
